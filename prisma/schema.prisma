@@ -1,0 +1,93 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  password      String?
+  otpSecret     String?
+  totpIsEnable  Boolean?  @default(false)
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  Sector        Sector[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Sector {
+  id            String         @id @default(cuid())
+  name          String         @unique
+  userId        String         @map("user_id")
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fileTemplates FileTemplate[]
+
+  @@map("sectors")
+}
+
+model FileTemplate {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  sectorId    String  @map("sector_id")
+  sector      Sector  @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+  files       File[]
+
+  @@map("fileTemplates")
+}
+
+model File {
+  id             String       @id @default(cuid())
+  name           String
+  content        String?
+  fileTemplateId String       @map("file_template_id")
+  fileTemplate   FileTemplate @relation(fields: [fileTemplateId], references: [id], onDelete: Cascade)
+
+  @@map("files")
+}
