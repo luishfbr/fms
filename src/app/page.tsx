@@ -1,7 +1,5 @@
-import Image from "next/image";
+import AuthForm from "./(auth)/_components/auth-form";
 
 export default function Home() {
-  return (
-    <main>Landing Page</main>
-  );
+  return <AuthForm />;
 }

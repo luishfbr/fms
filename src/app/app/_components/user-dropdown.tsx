@@ -1,3 +1,4 @@
+import { logout } from "@/app/(auth)/_actions/login";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +16,6 @@ import {
   RocketIcon,
 } from "@radix-ui/react-icons";
 import { Session } from "next-auth";
-import { signOut } from "next-auth/react";
 
 type UserDropdownProps = {
   user: Session["user"];
@@ -46,7 +46,7 @@ export function UserDropdown({ user }: UserDropdownProps) {
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="w-72" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user.name}</p>
@@ -67,7 +67,7 @@ export function UserDropdown({ user }: UserDropdownProps) {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => signOut()}>
+        <DropdownMenuItem onClick={() => logout()}>
           <LockClosedIcon className="w-3 h-3 mr-3" />
           Log out
         </DropdownMenuItem>

@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toaster";
 import register from "../_actions/register";
+import RegisterButton from "@/components/register-button";
 
 export function RegisterForm() {
   return (
@@ -49,16 +50,6 @@ export function RegisterForm() {
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="username">Usuário</Label>
-              <Input
-                id="username"
-                name="username"
-                type="text"
-                required
-                autoComplete="off"
-              />
-            </div>
-            <div className="space-y-1">
               <Label htmlFor="password">Senha</Label>
               <Input id="password" name="password" type="password" required />
             </div>
@@ -73,7 +64,7 @@ export function RegisterForm() {
             </div>
           </CardContent>
           <CardFooter className="flex text-center items-center justify-center">
-            <Button className="font-extralight">Registrar</Button>
+            <RegisterButton />
           </CardFooter>
         </form>
       </Card>

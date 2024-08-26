@@ -12,7 +12,6 @@ export default async function register(FormData: FormData) {
   try {
     const name = FormData.get("name") as string;
     const email = FormData.get("email") as string;
-    const username = FormData.get("username") as string;
     const password = FormData.get("password") as string;
 
     // Hash da senha
@@ -26,7 +25,6 @@ export default async function register(FormData: FormData) {
       data: {
         name: name,
         email: email,
-        username: username,
         password: hashedPassword,
         otpSecret: otpSecret,
         totpIsEnable: false,
