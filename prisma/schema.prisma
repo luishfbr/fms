@@ -19,7 +19,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   Sector        Sector[]
-  role          String?   @default("USER")
+  role          String?   @default("user")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
