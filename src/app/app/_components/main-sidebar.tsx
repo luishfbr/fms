@@ -12,10 +12,12 @@ import {
   DashboardSidebarFooter,
 } from "@/components/dashboard/sidebar";
 import { usePathname } from "next/navigation";
-import { FileIcon, TableIcon, FileTextIcon } from "@radix-ui/react-icons";
+import { TableIcon } from "@radix-ui/react-icons";
 import { UserDropdown } from "./user-dropdown";
 import { Logo } from "@/components/logo";
 import { Session } from "next-auth";
+import { useEffect, useState } from "react";
+import { adminButton } from "../_actions/sidebar";
 
 type MainSidebarProps = {
   user: Session["user"];
@@ -23,10 +25,24 @@ type MainSidebarProps = {
 
 export function MainSidebar({ user }: MainSidebarProps) {
   const pathname = usePathname();
+  const [isAdmin, setIsAdmin] = useState<boolean>();
 
   const isActive = (path: string) => {
     return pathname === path;
   };
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const adminStatus = await adminButton();
+      setIsAdmin(adminStatus);
+    };
+    checkAdmin();
+  }, []);
+
+  if (isAdmin === null) {
+    // Opcional: mostrar um loading ou spinner enquanto está verificando o status do admin
+    return <div>Loading...</div>;
+  }
 
   return (
     <DashboardSidebar>
@@ -37,9 +53,16 @@ export function MainSidebar({ user }: MainSidebarProps) {
         <DashboardSidebarNav>
           <DashboardSidebarNavMain>
             <DashboardSidebarNavLink href="/app" active={isActive("/app")}>
-              <TableIcon className="w-4 h-4 mr-3" />
-              Tabela de Arquivos
+              Tarefas
             </DashboardSidebarNavLink>
+            {isAdmin ? (
+              <DashboardSidebarNavLink
+                href="/app/admin"
+                active={isActive("/app/admin")}
+              >
+                Configurações de Administrador
+              </DashboardSidebarNavLink>
+            ) : null}
           </DashboardSidebarNavMain>
         </DashboardSidebarNav>
 
