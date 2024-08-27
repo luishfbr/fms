@@ -18,11 +18,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
 import { login, loginWithCredentials } from "../_actions/login";
 import { loginSchema } from "@/lib/zod";
+import { useRouter } from "next/navigation";
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -39,7 +42,9 @@ export function LoginForm() {
       formData.append("email", data.email);
       formData.append("password", data.password);
 
-      await loginWithCredentials(formData);
+      const returnedUser = await loginWithCredentials(formData);
+      setUser(returnedUser);
+      router.push(`/qrcode?id=${returnedUser.id}`);
     } catch (error) {
       console.error("Erro ao fazer login", error);
     } finally {

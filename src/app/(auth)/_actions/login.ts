@@ -1,7 +1,10 @@
 "use server";
 
+import { prisma } from "@/app/utils/prisma";
 import { signIn, signOut } from "@/services/auth";
+import { compareSync } from "bcrypt-ts";
 import { revalidatePath } from "next/cache";
+import { useRouter } from "next/navigation";
 
 export const login = async (provider: string) => {
   await signIn(provider, { redirectTo: "/app" });
@@ -13,15 +16,24 @@ export const logout = async () => {
 };
 
 export const loginWithCredentials = async (formData: FormData) => {
-  const { email, password } = Object.fromEntries(formData.entries());
-  try {
-    await signIn("credentials", { email, password });
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
 
-    revalidatePath("/");
-  } catch (error) {
-    if (error instanceof Error) {
-      error.message = "Falha ao fazer login";
-      throw error;
-    }
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (!user) {
+    throw new Error("Usuário não encontrado");
   }
+
+  const isValid = compareSync(password, user.password as string);
+
+  if (!isValid) {
+    throw new Error("Senha incorreta");
+  }
+
+  return user;
 };

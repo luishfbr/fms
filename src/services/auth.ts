@@ -35,12 +35,9 @@ export const {
     Credentials({
       credentials: {
         email: {},
-        password: {},
       },
       authorize: async (credentials) => {
         const email = credentials.email as string;
-        const password = credentials.password as string;
-
         const user = await prisma.user.findUnique({
           where: {
             email,
@@ -51,13 +48,13 @@ export const {
           return null;
         }
 
-        if (password) {
-          const valid = compareSync(password, user.password as string);
+        // if (password) {
+        //   const valid = compareSync(password, user.password as string);
 
-          if (!valid) {
-            return null;
-          }
-        }
+        //   if (!valid) {
+        //     return null;
+        //   }
+        // }
 
         return user;
       },

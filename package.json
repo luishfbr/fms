@@ -53,6 +53,8 @@
     "next-auth": "^5.0.0-beta.20",
     "next-themes": "^0.3.0",
     "nodemailer": "^6.9.14",
+    "otplib": "^12.0.1",
+    "qrcode": "^1.5.4",
     "react": "^18",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18",
@@ -67,6 +69,7 @@
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/qrcode": "^1.5.5",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
