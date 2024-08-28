@@ -18,10 +18,40 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  Sector        Sector[]
+  sectors       Sector[]  @relation("UserSectors")
   role          String?   @default("user")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+model Sector {
+  id            String         @id @default(cuid())
+  name          String         @unique
+  fileTemplates FileTemplate[]
+  users         User[]         @relation("UserSectors")
+
+  @@map("sectors")
+}
+
+model FileTemplate {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  sectorId    String  @map("sector_id")
+  sector      Sector  @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+  files       File[]
+
+  @@map("fileTemplates")
+}
+
+model File {
+  id             String       @id @default(cuid())
+  name           String
+  content        String?
+  fileTemplateId String       @map("file_template_id")
+  fileTemplate   FileTemplate @relation(fields: [fileTemplateId], references: [id], onDelete: Cascade)
+
+  @@map("files")
 }
 
 model Account {
@@ -60,35 +90,4 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-}
-
-model Sector {
-  id            String         @id @default(cuid())
-  name          String         @unique
-  userId        String         @map("user_id")
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  fileTemplates FileTemplate[]
-
-  @@map("sectors")
-}
-
-model FileTemplate {
-  id          String  @id @default(cuid())
-  name        String
-  description String?
-  sectorId    String  @map("sector_id")
-  sector      Sector  @relation(fields: [sectorId], references: [id], onDelete: Cascade)
-  files       File[]
-
-  @@map("fileTemplates")
-}
-
-model File {
-  id             String       @id @default(cuid())
-  name           String
-  content        String?
-  fileTemplateId String       @map("file_template_id")
-  fileTemplate   FileTemplate @relation(fields: [fileTemplateId], references: [id], onDelete: Cascade)
-
-  @@map("files")
 }

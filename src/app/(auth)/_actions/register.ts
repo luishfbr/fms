@@ -1,18 +1,20 @@
 "use server";
 
 import { prisma } from "@/app/utils/prisma";
+import { registerSchema } from "@/lib/zod";
 import { genSaltSync, hashSync } from "bcrypt-ts";
 import { randomBytes } from "crypto";
 import base32 from "hi-base32";
+import { z } from "zod";
+
+type data = z.infer<typeof registerSchema>;
 
 // Definição do salt para hash de senha
 const salt = genSaltSync(10);
 
-export default async function register(FormData: FormData) {
+export default async function RegisterUser(data: data) {
   try {
-    const name = FormData.get("name") as string;
-    const email = FormData.get("email") as string;
-    const password = FormData.get("password") as string;
+    const { name, email, password, role } = data;
 
     // Hash da senha
     const hashedPassword = hashSync(password, salt);
@@ -28,13 +30,16 @@ export default async function register(FormData: FormData) {
         password: hashedPassword,
         otpSecret: otpSecret,
         totpIsEnable: false,
+        role: role,
       },
     });
 
     if (createUser) {
       console.log("Usuário criado com sucesso!");
+      return true;
     } else {
       console.log("Usuário já existe");
+      return false;
     }
   } catch (error: any) {
     console.error("Erro:", error);

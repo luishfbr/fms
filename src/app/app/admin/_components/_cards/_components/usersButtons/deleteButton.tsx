@@ -10,16 +10,22 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { deleteUser } from "../_actions/users";
+import { deleteUser } from "../../_actions/users";
+import { useRouter } from "next/navigation";
 
 interface DeleteButtonProps {
   email: string;
 }
 
 export const DeleteButton: React.FC<DeleteButtonProps> = ({ email }) => {
+  const router = useRouter();
+
   const handleDelete = async () => {
-    await deleteUser(email);
-    // Optionally, you can add a function here to refresh the user list
+    try {
+      await deleteUser(email);
+    } catch (error) {
+      console.error("Erro ao excluir o usuário:", error);
+    }
   };
 
   return (
@@ -34,7 +40,7 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({ email }) => {
           <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
           <AlertDialogDescription>
             Ao clicar em OK, você irá excluir o usuário permanentemente. Esta
-            ação não pode ser desfeita. Apenas se criado novamente.
+            ação não pode ser desfeita.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

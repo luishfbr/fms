@@ -4,7 +4,6 @@ import { prisma } from "@/app/utils/prisma";
 import { signIn, signOut } from "@/services/auth";
 import { compareSync } from "bcrypt-ts";
 import { revalidatePath } from "next/cache";
-import { useRouter } from "next/navigation";
 
 export const login = async (provider: string) => {
   await signIn(provider, { redirectTo: "/app" });

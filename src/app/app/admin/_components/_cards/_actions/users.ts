@@ -13,12 +13,28 @@ export const getUsers = async () => {
   }));
 };
 
+export const getSectors = async () => {
+  const sectors = await prisma.sector.findMany();
+
+  return sectors.map((sector) => ({
+    name: sector.name ?? "",
+    id: sector.id ?? "",
+  }));
+};
+
 export const deleteUser = async (email: string) => {
   await prisma.user.delete({
     where: {
       email,
     },
   });
+};
+
+export const deleteSector = async (id: string) => {
+  await prisma.sector.delete({
+    where: { id },
+  });
+  return true;
 };
 
 export const getUserByEmail = async (email: string) => {
@@ -42,5 +58,36 @@ export const updateUser = async (email: string, data: any) => {
       email,
     },
     data,
+  });
+};
+
+export const createSector = async (FormData: FormData) => {
+  try {
+    const name = FormData.get("name") as string;
+
+    const createSector = await prisma.sector.create({
+      data: {
+        name,
+      },
+    });
+
+    if (!createSector) {
+      throw new Error("Erro ao criar setor");
+    } else {
+      return true;
+    }
+  } catch (error: any) {
+    console.error("Erro:", error);
+  }
+};
+
+export const updateRoleUser = async (email: string, data: any) => {
+  await prisma.user.update({
+    where: {
+      email,
+    },
+    data: {
+      role: data.role,
+    },
   });
 };
