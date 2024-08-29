@@ -11,6 +11,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createSector } from "./_actions/users";
@@ -22,13 +32,20 @@ type FormData = {
   name: string;
 };
 
-export function CreateNewSector() {
+interface CreateButtonProps {
+  onCreateSuccess: () => void;
+}
+
+export const CreateNewSector: React.FC<CreateButtonProps> = ({
+  onCreateSuccess,
+}) => {
   const { showToast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { isValid },
   } = useForm<FormData>();
 
@@ -41,6 +58,8 @@ export function CreateNewSector() {
       const createSectorResponse = await createSector(formData);
 
       if (createSectorResponse === true) {
+        onCreateSuccess();
+        reset();
         showToast("Setor criado com sucesso!Atualize a página...");
       }
       setIsSubmitting(false);
@@ -51,24 +70,25 @@ export function CreateNewSector() {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Crie um Novo Setor</CardTitle>
-        <CardDescription>
-          Insira o nome do setor que deseja criar.
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent>
-          <Label htmlFor="name">Nome do Setor</Label>
-          <Input type="text" required {...register("name")} />
-        </CardContent>
-        <CardFooter className="flex text-center justify-center">
-          <Button type="submit" disabled={isSubmitting || !isValid}>
-            {isSubmitting ? "Criando..." : "Criar Setor"}
-          </Button>
-        </CardFooter>
-      </form>
-    </Card>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Criar novo setor</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="mb-6">
+            <Label htmlFor="name">Nome do Setor</Label>
+            <Input type="text" required {...register("name")} />
+          </div>
+          <DialogFooter>
+            <DialogClose>
+              <Button type="submit" disabled={isSubmitting || !isValid}>
+                {isSubmitting ? "Criando..." : "Criar Setor"}
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
-}
+};

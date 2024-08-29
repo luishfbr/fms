@@ -121,3 +121,22 @@ export const updatePassword = async (
     return false;
   }
 };
+
+export const getUsersOnSectorById = async (
+  sectorId: string
+): Promise<string[]> => {
+  const users = await prisma.user.findMany({
+    where: {
+      sectors: {
+        some: {
+          id: sectorId,
+        },
+      },
+    },
+    select: {
+      name: true,
+    },
+  });
+
+  return users.map((user) => user.name || "");
+};
