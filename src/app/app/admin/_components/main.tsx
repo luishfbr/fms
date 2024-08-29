@@ -7,9 +7,9 @@ export const Main = () => {
       <>
         <CardUsers />
       </>
-      <>
+      <div className="flex flex-col">
         <CardSectors />
-      </>
+      </div>
     </div>
   );
 };
