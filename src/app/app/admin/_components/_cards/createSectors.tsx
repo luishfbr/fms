@@ -14,23 +14,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createSector } from "./_actions/users";
-import { redirect, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-import { revalidatePath } from "next/cache";
+import { useToast } from "../../ToastContext";
 
 type FormData = {
   name: string;
 };
 
 export function CreateNewSector() {
+  const { showToast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { isValid },
   } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
@@ -40,13 +39,17 @@ export function CreateNewSector() {
       formData.append("name", data.name);
 
       const createSectorResponse = await createSector(formData);
-      
-      if (createSectorResponse === true) {        
-        redirect("/app");
+
+      if (createSectorResponse === true) {
+        showToast("Setor criado com sucesso!Atualize a página...");
       }
       setIsSubmitting(false);
-    } catch (error) {}
+    } catch (error) {
+      setIsSubmitting(false);
+      showToast("Erro ao criar setor!");
+    }
   };
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -57,7 +60,7 @@ export function CreateNewSector() {
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent>
-          <Label htmlFor="">Nome do Setor</Label>
+          <Label htmlFor="name">Nome do Setor</Label>
           <Input type="text" required {...register("name")} />
         </CardContent>
         <CardFooter className="flex text-center justify-center">

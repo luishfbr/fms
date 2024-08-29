@@ -1,7 +1,6 @@
-"use client";
-
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -11,30 +10,30 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  getUserByEmail,
-  updateRoleUser,
-  updateUser,
-} from "../../_actions/users";
-import { useEffect, useState } from "react";
+import { updateRoleUser } from "../../_actions/users";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import { useToast } from "@/app/app/admin/ToastContext";
 
 interface ChangeRoleProps {
   email: string;
+  onChangeSuccess: () => void;
 }
 
 interface UserFormData {
   role: string;
 }
 
-export const ChangeRole: React.FC<ChangeRoleProps> = ({ email }) => {
-  const router = useRouter();
+export const ChangeRole: React.FC<ChangeRoleProps> = ({
+  email,
+  onChangeSuccess,
+}) => {
+  const { showToast } = useToast();
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
+    setValue,
   } = useForm<UserFormData>({
     defaultValues: {
       role: "user",
@@ -42,37 +41,31 @@ export const ChangeRole: React.FC<ChangeRoleProps> = ({ email }) => {
   });
 
   const [roleSelected, setRoleSelected] = useState<string>("user");
-  const [dataUser, setDataUser] = useState<UserFormData | null>(null);
 
-  const getDataUser = async () => {
-    const user = await getUserByEmail(email);
-    if (user) {
-      setDataUser({
-        role: user.role ?? "",
-      });
-      setValue("role", user.role ?? "");
-    }
-  };
-
+  // Set roleSelected and update the form value
   const selectAdmin = () => {
     setRoleSelected("admin");
+    setValue("role", "admin");
   };
   const selectUser = () => {
     setRoleSelected("user");
+    setValue("role", "user");
   };
   const selectCreator = () => {
     setRoleSelected("creator");
+    setValue("role", "creator");
   };
 
   const onSubmit = async (data: UserFormData) => {
-    await updateRoleUser(email, data);
-    console.log(data);
-    alert("User updated successfully");
+    try {
+      await updateRoleUser(email, data);
+      onChangeSuccess();
+      showToast("Troca de permissão realizada com sucesso!");
+    } catch (error) {
+      console.error("Erro ao atualizar a permissão do usuário:", error);
+      showToast("Erro ao atualizar a permissão do usuário");
+    }
   };
-
-  useEffect(() => {
-    getDataUser();
-  }, [email]);
 
   return (
     <AlertDialog>
@@ -103,15 +96,9 @@ export const ChangeRole: React.FC<ChangeRoleProps> = ({ email }) => {
           </span>
         </div>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <input
-            type="text"
-            value={roleSelected}
-            {...register("role")}
-            className="sr-only"
-          />
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <Button type="submit">Salvar</Button>
+            <AlertDialogAction type="submit">Salvar</AlertDialogAction>
           </AlertDialogFooter>
         </form>
       </AlertDialogContent>

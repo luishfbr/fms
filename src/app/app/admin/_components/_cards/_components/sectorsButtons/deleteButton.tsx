@@ -1,5 +1,6 @@
-"use client";
+// components/DeleteButton.tsx
 
+import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,20 +12,27 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import { deleteSector } from "../../_actions/users";
-import { useRouter } from "next/navigation";
-import { useRef } from "react";
+import { useToast } from "@/app/app/admin/ToastContext";
 
 interface DeleteButtonProps {
   id: string;
 }
 
 export const DeleteButton: React.FC<DeleteButtonProps> = ({ id }) => {
-  const router = useRouter();
-  const ref = useRef<HTMLDivElement>(null);
+  const { showToast } = useToast();
+
   const handleDelete = async () => {
-    await deleteSector(id);
+    try {
+      const response = await deleteSector(id);
+      if (response === true) {
+        showToast("Setor excluído com sucesso!");
+      } else {
+        showToast("Falha ao excluir o setor.");
+      }
+    } catch (error) {
+      showToast("Erro ao excluir o setor.");
+    }
   };
 
   return (
@@ -38,8 +46,8 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({ id }) => {
         <AlertDialogHeader>
           <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
           <AlertDialogDescription>
-            Ao clicar em OK, você irá excluir o setor permanentemente. Esta ação
-            não pode ser desfeita. Apenas se criado novamente.
+            Ao clicar em OK, você irá excluir o setor permanentemente. Esta
+            ação não pode ser desfeita.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

@@ -11,159 +11,79 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getUserByEmail, updateUser } from "../../_actions/users";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
+import { updatePasswordSchema } from "@/lib/zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useToast } from "@/app/app/admin/ToastContext";
+import { updatePassword } from "../../_actions/users";
 
 interface EditButtonProps {
   email: string;
 }
 
-interface UserFormData {
-  name: string;
-  email: string;
-  password: string;
-  passwordAgain: string;
-  role: string;
-}
+type EditPasswordSchema = z.infer<typeof updatePasswordSchema>;
 
 export const EditButton: React.FC<EditButtonProps> = ({ email }) => {
+  const { showToast } = useToast();
   const {
     register,
     handleSubmit,
-    setValue,
+    reset,
     formState: { errors },
-  } = useForm<UserFormData>({
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      passwordAgain: "",
-      role: "",
-    },
+  } = useForm<EditPasswordSchema>({
+    resolver: zodResolver(updatePasswordSchema),
   });
 
-  const [dataUser, setDataUser] = useState<UserFormData | null>(null);
-  const [roles] = useState(["admin", "user"]); // Assuming roles are static
-
-  const getDataUser = async () => {
-    const user = await getUserByEmail(email);
-    if (user) {
-      setDataUser({
-        name: user.name ?? "",
-        email: user.email ?? "",
-        password: "",
-        passwordAgain: "",
-        role: user.role ?? "",
-      });
-      setValue("name", user.name ?? "");
-      setValue("email", user.email ?? "");
-      setValue("role", user.role ?? "");
+  const onSubmit: SubmitHandler<EditPasswordSchema> = async (data) => {
+    try {
+      const response = await updatePassword(email, data.password);
+      if (response) {
+        showToast("Senha alterada com sucesso!");
+        reset();
+      } else {
+        showToast("Falha ao alterar senha.");
+      }
+    } catch (error) {
+      console.error("Detalhes do erro:", error);
+      showToast("Erro ao alterar senha.");
     }
   };
-
-  const onSubmit = async (data: UserFormData) => {
-    if (data.password !== data.passwordAgain) {
-      alert("Passwords do not match");
-      return;
-    }
-
-    await updateUser(email, data); // Assuming you have an updateUser function
-    alert("User updated successfully");
-  };
-
-  useEffect(() => {
-    getDataUser();
-  }, [email]);
-
-  if (!dataUser) {
-    return null; // You can also add a loading spinner or message here
-  }
-
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button className="w-40" variant={"edit"}>
-          Editar Usuário
+          Trocar Senha
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="w-[400px]">
         <AlertDialogHeader>
-          <AlertDialogTitle>Editar Usuário</AlertDialogTitle>
+          <AlertDialogTitle>Troque a senha do usuário.</AlertDialogTitle>
           <AlertDialogDescription>
-            Preencha os dados do usuário abaixo:
+            Preencha os dados abaixo:
           </AlertDialogDescription>
         </AlertDialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="my-2">
-            <Label htmlFor="name">Nome</Label>
-            <Input
-              type="text"
-              placeholder="Nome"
-              required
-              {...register("name")}
-            />
-          </div>
-          <div className="my-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              type="email"
-              placeholder="Email"
-              required
-              {...register("email")}
-            />
-          </div>
-          <div className="my-2">
+          <div className="space-y-1">
             <Label htmlFor="password">Senha</Label>
-            <Input
-              type="password"
-              placeholder="Senha"
-              required
-              {...register("password")}
-            />
+            <Input {...register("password")} type="password" required />
+            {errors.password && (
+              <p className="text-red-700 text-sm">{errors.password.message}</p>
+            )}
           </div>
-          <div className="my-2">
+          <div className="space-y-1">
             <Label htmlFor="passwordAgain">Digite Novamente</Label>
-            <Input
-              type="password"
-              placeholder="Confirme a senha"
-              required
-              {...register("passwordAgain")}
-            />
+            <Input {...register("passwordAgain")} type="password" required />
+            {errors.passwordAgain && (
+              <p className="text-red-700 text-sm">
+                {errors.passwordAgain.message}
+              </p>
+            )}
           </div>
-          <div className="my-4 flex flex-col items-center justify-center">
-            <span className="text-sm">
-              Mudar permissão. Atual: {dataUser.role}
-            </span>
-            <div className="flex gap-6 mt-2">
-              <Select defaultValue={dataUser.role} {...register("role")}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione uma permissão" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {roles.map((role) => (
-                      <SelectItem key={role} value={role}>
-                        {role.charAt(0).toUpperCase() + role.slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="mt-4">
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <Button type="submit">Salvar</Button>
           </AlertDialogFooter>

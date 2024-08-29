@@ -9,6 +9,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,18 +26,25 @@ import { registerSchema } from "@/lib/zod";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import RegisterUser from "@/app/(auth)/_actions/register";
+import { useToast } from "../../ToastContext";
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
-export const CreateNewUser = () => {
-  const router = useRouter();
+interface CreateButtonProps {
+  onCreateSuccess: () => void;
+}
+
+export const CreateNewUser: React.FC<CreateButtonProps> = ({
+  onCreateSuccess,
+}) => {
+  const { showToast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
+    reset,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     mode: "onChange",
@@ -37,23 +54,24 @@ export const CreateNewUser = () => {
     setIsSubmitting(true);
     try {
       const response = await RegisterUser(data);
-      return response;
+      if (response === true) {
+        onCreateSuccess();
+        reset();
+        showToast("Usuário registrado com sucesso!");
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <Card>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <CardHeader>
-          <CardTitle>Crie uma nova conta</CardTitle>
-          <CardDescription>
-            Insira as informações e registre-se em nosso gerenciador de
-            arquivos.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2">
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Criar novo usuário</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader></DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-1">
             <Label htmlFor="name">Nome</Label>
             <Input
@@ -94,13 +112,15 @@ export const CreateNewUser = () => {
               </p>
             )}
           </div>
-        </CardContent>
-        <CardFooter className="flex text-center items-center justify-center">
-          <Button type="submit" disabled={isSubmitting || !isValid}>
-            {isSubmitting ? "Carregando..." : "Registrar"}
-          </Button>
-        </CardFooter>
-      </form>
-    </Card>
+          <DialogFooter className="mt-6">
+            <DialogClose>
+              <Button type="submit" disabled={isSubmitting || !isValid}>
+                {isSubmitting ? "Carregando..." : "Registrar"}
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };

@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-
 import {
   Card,
   CardContent,
@@ -24,39 +23,39 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { EditButton } from "./_components/usersButtons/editButton";
 import { ChangeRole } from "./_components/usersButtons/changeRole";
+import { CreateNewUser } from "./createNewUser";
 
-type Users = {
+export type User = {
   name: string;
   email: string;
   role: string;
 };
 
 export function CardUsers() {
-  const [users, setUsers] = React.useState<Users[]>([]);
+  const [user, setUser] = React.useState<User[]>([]);
   const [searchTerm, setSearchTerm] = React.useState<string>("");
 
-  // Função para buscar usuários
+  const fetchData = async () => {
+    try {
+      const fetchedUsers = await getUsers();
+      setUser(fetchedUsers);
+    } catch (error) {
+      console.error("Falha ao buscar usuários.", error);
+    }
+  };
+
   React.useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const fetchedUsers = await getUsers();
-        setUsers(fetchedUsers);
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-      }
-    };
     fetchData();
   }, []);
 
-  // Filtrar usuários com base no termo de pesquisa
-  const filteredUsers = users.filter((user) =>
+  const filteredUsers = user.filter((user) =>
     [user.name, user.email, user.role].some((field) =>
       field.toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
 
   return (
-    <Card className="w-full">
+    <Card className={`${styles.card} w-full h-[855px]`}>
       <CardHeader>
         <CardTitle>Lista de Usuários Cadastrados</CardTitle>
         <CardDescription>
@@ -64,19 +63,23 @@ export function CardUsers() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div>
+        <div className={styles.searchContainer}>
           <input
             type="text"
             placeholder="Pesquisar..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="mb-4 h-10 w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className={styles.searchInput}
           />
         </div>
-        <ScrollArea className="h-72 rounded-md border">
+        <ScrollArea
+          className={`${styles.scrollArea} h-[620px] max-h-[1000px] rounded-md border`}
+        >
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table
+              className={`${styles.table} min-w-full divide-y divide-gray-200`}
+            >
+              <thead className={styles.tableHeader}>
                 <tr>
                   <th className={styles.th}>Nome</th>
                   <th className={styles.th}>Email</th>
@@ -84,16 +87,14 @@ export function CardUsers() {
                   <th className={styles.th}></th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className={styles.tableBody}>
                 {filteredUsers.length > 0 ? (
                   filteredUsers.map((user) => (
-                    <tr key={user.email}>
-                      <td className="px-2 py-4 text-center whitespace-nowrap text-sm font-medium text-gray-900">
-                        {user.name}
-                      </td>
+                    <tr key={user.email} className={styles.tableRow}>
+                      <td className={styles.td}>{user.name}</td>
                       <td className={styles.td}>{user.email}</td>
                       <td className={styles.td}>{user.role}</td>
-                      <td>
+                      <td className={styles.td}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild className="flex">
                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -102,10 +103,12 @@ export function CardUsers() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="center">
-                            <DeleteButton email={user.email} />
+                            <DeleteButton
+                              email={user.email}
+                              onDeleteSuccess={fetchData}
+                            />
                             <DropdownMenuSeparator />
-
-                            <ChangeRole email={user.email} />
+                            <ChangeRole email={user.email} onChangeSuccess={fetchData}/>
                             <DropdownMenuSeparator />
                             <EditButton email={user.email} />
                           </DropdownMenuContent>
@@ -116,7 +119,7 @@ export function CardUsers() {
                 ) : (
                   <tr>
                     <td
-                      colSpan={3}
+                      colSpan={4}
                       className="px-6 py-4 text-center text-sm text-gray-500"
                     >
                       Nenhum usuário encontrado.
@@ -129,9 +132,7 @@ export function CardUsers() {
         </ScrollArea>
       </CardContent>
       <CardFooter className="flex text-center justify-center">
-        <span className="text-sm text-muted-foreground">
-          Acesse o cartão ao lado para registrar um novo usuário.
-        </span>
+        <CreateNewUser onCreateSuccess={fetchData} />
       </CardFooter>
     </Card>
   );

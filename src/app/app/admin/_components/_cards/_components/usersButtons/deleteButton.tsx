@@ -1,3 +1,5 @@
+"use client";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,20 +13,27 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { deleteUser } from "../../_actions/users";
-import { useRouter } from "next/navigation";
+import { useToast } from "@/app/app/admin/ToastContext";
 
 interface DeleteButtonProps {
   email: string;
+  onDeleteSuccess: () => void;
 }
 
-export const DeleteButton: React.FC<DeleteButtonProps> = ({ email }) => {
-  const router = useRouter();
-
+export const DeleteButton: React.FC<DeleteButtonProps> = ({
+  email,
+  onDeleteSuccess,
+}) => {
+  const { showToast } = useToast();
   const handleDelete = async () => {
     try {
-      await deleteUser(email);
+      const response = await deleteUser(email);
+      if (response === true) {
+        onDeleteSuccess();
+        showToast("Usuário excluído com sucesso!");
+      }
     } catch (error) {
-      console.error("Erro ao excluir o usuário:", error);
+      showToast("Erro ao deletar usuário!");
     }
   };
 

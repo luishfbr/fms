@@ -9,11 +9,10 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getSectors, getUsers } from "../_actions/users";
+import { getSectors } from "../_actions/users";
 import { DeleteButton } from "./sectorsButtons/deleteButton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { useRouter } from "next/navigation";
 
 export type Sector = {
   id: string;
@@ -21,15 +20,14 @@ export type Sector = {
 };
 
 export const Sectors = () => {
-  const router = useRouter();
   const [sectors, setSectors] = React.useState<Sector[]>([]);
 
+  const fetchData = async () => {
+    const fetchedSectors = await getSectors();
+    setSectors(fetchedSectors);
+  };
 
   React.useEffect(() => {
-    const fetchData = async () => {
-      const fetchedSectors = await getSectors();
-      setSectors(fetchedSectors);
-    };
     fetchData();
   }, []);
 

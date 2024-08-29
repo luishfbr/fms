@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/app/utils/prisma";
+import { genSaltSync, hashSync } from "bcrypt-ts";
 
 export const getUsers = async () => {
   const users = await prisma.user.findMany();
@@ -23,18 +24,26 @@ export const getSectors = async () => {
 };
 
 export const deleteUser = async (email: string) => {
-  await prisma.user.delete({
+  const response = await prisma.user.delete({
     where: {
       email,
     },
   });
+  if (response) {
+    return true;
+  } else {
+    return false;
+  }
 };
 
 export const deleteSector = async (id: string) => {
-  await prisma.sector.delete({
+  const response = await prisma.sector.delete({
     where: { id },
   });
-  return true;
+
+  if (response) {
+    return true;
+  }
 };
 
 export const getUserByEmail = async (email: string) => {
@@ -90,4 +99,25 @@ export const updateRoleUser = async (email: string, data: any) => {
       role: data.role,
     },
   });
+};
+
+const salt = genSaltSync(10);
+
+export const updatePassword = async (
+  email: string,
+  password: string
+): Promise<boolean> => {
+  try {
+    const hashedPassword = hashSync(password, salt);
+
+    const updatedPassword = await prisma.user.update({
+      where: { email },
+      data: { password: hashedPassword },
+    });
+
+    return !!updatedPassword; // Retorna verdadeiro se o usuário foi atualizado com sucesso
+  } catch (error) {
+    console.error("Erro ao atualizar senha:", error);
+    return false;
+  }
 };
