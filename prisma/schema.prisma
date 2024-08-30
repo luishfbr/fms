@@ -27,21 +27,41 @@ model User {
 model Sector {
     id            String         @id @default(cuid())
     name          String         @unique
-    fileTemplates FileTemplate[]
+    fileTemplates FileTemplate[] //Se eu precisar pegar os modelos existentes para o setor é só buscar por fileTemplates
     users         User[]         @relation("UserSectors")
 
     @@map("sectors")
 }
 
 model FileTemplate {
-    id          String  @id @default(cuid())
+    id          String   @id @default(cuid())
     name        String
-    description String?
-    sectorId    String  @map("sector_id")
-    sector      Sector  @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+    fieldsModel Fields[]
+    sectorId    String   @map("sector_id")
+    sector      Sector   @relation(fields: [sectorId], references: [id], onDelete: Cascade)
     files       File[]
 
     @@map("fileTemplates")
+}
+
+model Fields {
+    id             String        @id @default(cuid())
+    name           String
+    type           String
+    options        Options[]
+    fileTemplate   FileTemplate? @relation(fields: [fileTemplateId], references: [id], onDelete: Cascade)
+    fileTemplateId String?
+
+    @@map("fields")
+}
+
+model Options {
+    id       String  @id @default(cuid())
+    value    String
+    fields   Fields? @relation(fields: [fieldsId], references: [id], onDelete: Cascade)
+    fieldsId String?
+
+    @@map("options")
 }
 
 model File {

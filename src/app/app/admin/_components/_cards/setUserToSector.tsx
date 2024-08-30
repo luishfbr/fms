@@ -69,8 +69,11 @@ export const CardSetUserToSector = () => {
             </span>
             <div className="flex flex-col text-center">
               {users.length > 0 ? (
-                users.map((user) => (
-                  <span className="px-6 py-1 text-center text-sm text-muted-foreground">
+                users.map((user, index) => (
+                  <span
+                    key={index}
+                    className="px-6 py-1 text-center text-sm text-muted-foreground"
+                  >
                     {user.name}
                   </span>
                 ))

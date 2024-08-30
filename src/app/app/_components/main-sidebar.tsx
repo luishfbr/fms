@@ -12,12 +12,11 @@ import {
   DashboardSidebarFooter,
 } from "@/components/dashboard/sidebar";
 import { usePathname } from "next/navigation";
-import { TableIcon } from "@radix-ui/react-icons";
 import { UserDropdown } from "./user-dropdown";
 import { Logo } from "@/components/logo";
 import { Session } from "next-auth";
 import { useEffect, useState } from "react";
-import { adminButton, creatorButton } from "../_actions/sidebar";
+import { adminButton } from "../_actions/sidebar";
 
 type MainSidebarProps = {
   user: Session["user"];
@@ -26,7 +25,6 @@ type MainSidebarProps = {
 export function MainSidebar({ user }: MainSidebarProps) {
   const pathname = usePathname();
   const [isAdmin, setIsAdmin] = useState<boolean>();
-  const [isCreator, setIsCreator] = useState<boolean>();
 
   const isActive = (path: string) => {
     return pathname === path;
@@ -37,18 +35,11 @@ export function MainSidebar({ user }: MainSidebarProps) {
       const adminStatus = await adminButton();
       setIsAdmin(adminStatus);
     };
-    const checkCreator = async () => {
-      const creatorStatus = await creatorButton();
-      setIsCreator(creatorStatus);
-    };
+
     checkAdmin();
-    checkCreator();
   }, []);
 
   if (isAdmin === null) {
-    return <div>Loading...</div>;
-  }
-  if (isCreator === null) {
     return <div>Loading...</div>;
   }
 
@@ -61,16 +52,8 @@ export function MainSidebar({ user }: MainSidebarProps) {
         <DashboardSidebarNav>
           <DashboardSidebarNavMain>
             <DashboardSidebarNavLink href="/app" active={isActive("/app")}>
-              Tarefas
+              Tabela de Arquivos
             </DashboardSidebarNavLink>
-            {isAdmin || isCreator ? (
-              <DashboardSidebarNavLink
-                href="/app/creator"
-                active={isActive("/app/creator")}
-              >
-                Criar Novo Modelo
-              </DashboardSidebarNavLink>
-            ) : null}
             {isAdmin ? (
               <DashboardSidebarNavLink
                 href="/app/admin"

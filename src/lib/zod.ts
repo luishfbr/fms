@@ -57,3 +57,11 @@ export const updatePasswordSchema = z
     message: "As senhas não coincidem",
     path: ["passwordAgain"],
   });
+
+export const createModelSchema = z.object({
+  name: z
+    .string({ required_error: "Nome obrigatório!" })
+    .min(1, "Nome obrigatório"),
+  description: z.string().min(1, "Descrição obrigatória"),
+  fileTemplateId: z.string().min(1, "Id do modelo obrigatório"),
+});
