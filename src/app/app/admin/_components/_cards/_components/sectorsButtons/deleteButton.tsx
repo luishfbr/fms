@@ -13,7 +13,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { deleteSector } from "../../_actions/users";
-import { useToast } from "@/app/app/admin/ToastContext";
+import { useToast } from "@/app/utils/ToastContext";
 
 interface DeleteButtonProps {
   id: string;

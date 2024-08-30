@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { updateRoleUser } from "../../_actions/users";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useToast } from "@/app/app/admin/ToastContext";
+import { useToast } from "@/app/utils/ToastContext";
 
 interface ChangeRoleProps {
   email: string;

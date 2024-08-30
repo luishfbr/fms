@@ -23,3 +23,22 @@ export const adminButton = async () => {
     return false;
   }
 };
+
+export const creatorButton = async () => {
+  const session = await auth();
+  if (session?.user) {
+    const email = session.user.email as string;
+    const response = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        role: true,
+      },
+    });
+    if (response?.role === "creator") {
+      return true;
+    }
+    return false;
+  }
+};

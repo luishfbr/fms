@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { deleteUser } from "../../_actions/users";
-import { useToast } from "@/app/app/admin/ToastContext";
+import { useToast } from "@/app/utils/ToastContext";
 
 interface DeleteButtonProps {
   email: string;

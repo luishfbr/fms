@@ -7,9 +7,6 @@ import {
   DashboardPageHeaderTitle,
   DashboardPageMain,
 } from "@/components/dashboard/page";
-import { Button } from "@/components/ui/button";
-import { PlusIcon } from "@radix-ui/react-icons";
-import { getUserTodos } from "./actions";
 import { NewModelSheet } from "./_components/new-model-sheet";
 
 export default function Page() {

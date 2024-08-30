@@ -4,13 +4,12 @@ import * as React from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { CreateNewSector } from "./createSectors";
-import { BadgePlus, MoreHorizontal } from "lucide-react";
+import { BadgeMinus, BadgePlus, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,8 +19,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
+  excludeUserToSectorById,
   getSectors,
-  getUsers,
+  getUsersAlreadyHave,
   getUsersAndVerifySector,
   getUsersOnSectorById,
   includeUserToSectorById,
@@ -36,6 +36,7 @@ import {
 import { Eye } from "lucide-react";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -43,6 +44,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useToast } from "../../../../utils/ToastContext";
 
 export type Sector = {
   id: string;
@@ -55,23 +57,25 @@ export type User = {
   role: string;
 };
 
-type SectorUser = {
+type ReturnedUser = {
   id: string;
-};
-
-export type IncludeUser = {
-  id: string;
-  name: string;
-  sectorIds: string[];
+  name: string | null;
 };
 
 export const CardSectors = () => {
+  const { showToast } = useToast();
   const [sectors, setSectors] = React.useState<Sector[]>([]);
   const [usersOnSector, setUsersOnSector] = React.useState<string[]>([]);
-  const [users, setUsers] = React.useState<IncludeUser[]>([]);
+  const [users, setUsers] = React.useState<ReturnedUser[]>([]);
+  const [usersHave, setUsersHave] = React.useState<ReturnedUser[]>([]);
 
-  const fetchUsers = async () => {
-    const fetchedUsers = await getUsersAndVerifySector();
+  const fetchUsersHave = async (sectorId: string) => {
+    const fetchedUsersHave = await getUsersAlreadyHave(sectorId);
+    setUsersHave(fetchedUsersHave);
+  };
+
+  const fetchUsersNonHave = async (sectorId: string) => {
+    const fetchedUsers = await getUsersAndVerifySector(sectorId);
     setUsers(fetchedUsers);
   };
 
@@ -79,8 +83,21 @@ export const CardSectors = () => {
     try {
       await includeUserToSectorById(userId, sectorId);
       fetchData();
+      showToast("Usuário incluído com sucesso!");
     } catch (error) {
-      console.error("Failed to include user to sector:", error);
+      console.error("Falha ao incluir usuário ao setor:", error);
+      showToast("Falha ao incluir usuário ao setor!");
+    }
+  };
+
+  const excludeUserToSector = async (userId: string, sectorId: string) => {
+    try {
+      await excludeUserToSectorById(userId, sectorId);
+      fetchData();
+      showToast("Usuário excluído com sucesso!");
+    } catch (error) {
+      console.error("Falha ao excluir usuário do setor:", error);
+      showToast("Usuário excluído com sucesso!");
     }
   };
 
@@ -90,7 +107,6 @@ export const CardSectors = () => {
       setUsersOnSector(response);
     } catch (error) {
       console.error("Failed to fetch users:", error);
-
       setUsersOnSector([]);
     }
   };
@@ -133,6 +149,51 @@ export const CardSectors = () => {
                           <span>{sector.name}</span>
                         </td>
                         <td className={styles.td}>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                onClick={() => fetchUsersHave(sector.id)}
+                                variant={"ghost"}
+                              >
+                                <BadgeMinus className="h-5 w-5" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px]">
+                              <DialogHeader>
+                                <DialogTitle>
+                                  Exclua um usuário por vez do setor:
+                                </DialogTitle>
+                                <DialogDescription>
+                                  {sector.name}
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="flex flex-col text-center gap-0.5">
+                                {usersHave.length > 0 ? (
+                                  usersHave.map((user, index) => (
+                                    <DialogClose key={index}>
+                                      <Button
+                                        variant={"outline"}
+                                        className="text-sm text-muted-foreground"
+                                        onClick={() =>
+                                          excludeUserToSector(
+                                            user.id,
+                                            sector.id
+                                          )
+                                        }
+                                      >
+                                        {user.name}
+                                      </Button>
+                                    </DialogClose>
+                                  ))
+                                ) : (
+                                  <span className="text-sm text-muted-foreground text-center">
+                                    Nenhum usuário cadastrado no setor.
+                                  </span>
+                                )}
+                              </div>
+                              <DialogFooter></DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                           <Popover>
                             <PopoverTrigger asChild>
                               <Button
@@ -173,7 +234,7 @@ export const CardSectors = () => {
                           <Dialog>
                             <DialogTrigger asChild>
                               <Button
-                                onClick={() => fetchUsers()}
+                                onClick={() => fetchUsersNonHave(sector.id)}
                                 variant={"ghost"}
                               >
                                 <BadgePlus className="h-5 w-5" />
@@ -191,20 +252,25 @@ export const CardSectors = () => {
                               <div className="flex flex-col text-center gap-0.5">
                                 {users.length > 0 ? (
                                   users.map((user, index) => (
-                                    <Button
-                                      variant={"outline"}
-                                      className="text-sm text-muted-foreground"
-                                      key={index}
-                                      onClick={() =>
-                                        includeUserToSector(user.id, sector.id)
-                                      }
-                                    >
-                                      {user.name}
-                                    </Button>
+                                    <DialogClose key={index}>
+                                      <Button
+                                        variant={"outline"}
+                                        className="text-sm text-muted-foreground"
+                                        onClick={() =>
+                                          includeUserToSector(
+                                            user.id,
+                                            sector.id
+                                          )
+                                        }
+                                      >
+                                        {user.name}
+                                      </Button>
+                                    </DialogClose>
                                   ))
                                 ) : (
                                   <span className="text-sm text-muted-foreground text-center">
-                                    Nenhum usuário encontrado.
+                                    Todos os usuários estão cadastrados no
+                                    setor.
                                   </span>
                                 )}
                               </div>

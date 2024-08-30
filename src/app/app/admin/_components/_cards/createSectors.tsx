@@ -26,7 +26,7 @@ import { Label } from "@/components/ui/label";
 import { createSector } from "./_actions/users";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-import { useToast } from "../../ToastContext";
+import { useToast } from "../../../../utils/ToastContext";
 
 type FormData = {
   name: string;

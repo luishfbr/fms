@@ -18,7 +18,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { updatePasswordSchema } from "@/lib/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useToast } from "@/app/app/admin/ToastContext";
+import { useToast } from "@/app/utils/ToastContext";
 import { updatePassword } from "../../_actions/users";
 
 interface EditButtonProps {

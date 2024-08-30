@@ -2,7 +2,6 @@
 
 import { prisma } from "@/app/utils/prisma";
 import { genSaltSync, hashSync } from "bcrypt-ts";
-import { IncludeUser } from "../sectors";
 
 export const getUsers = async () => {
   const users = await prisma.user.findMany();
@@ -181,22 +180,63 @@ export const includeUserToSectorById = async (id: string, sectorId: string) => {
   }
 };
 
-export const getUsersAndVerifySector = async (): Promise<IncludeUser[]> => {
-  const users = await prisma.user.findMany({
+export const excludeUserToSectorById = async (id: string, sectorId: string) => {
+  const getSector = await prisma.sector.findUnique({
+    where: {
+      id: sectorId,
+    },
+    select: {
+      id: true,
+    },
+  });
+  if (!getSector) {
+    throw new Error("Erro ao encontrar setor");
+  }
+  const excludeUser = await prisma.user.update({
+    where: {
+      id: id,
+    },
+    data: {
+      sectors: {
+        disconnect: {
+          id: getSector.id,
+        },
+      },
+    },
     select: {
       id: true,
       name: true,
+    },
+  });
+  if (!excludeUser) {
+    throw new Error("Erro ao excluir usuário do setor");
+  } else {
+    return true;
+  }
+};
+
+export const getUsersAndVerifySector = async (sectorId: string) => {
+  const users = await prisma.user.findMany({
+    where: {
       sectors: {
-        select: {
-          id: true,
+        none: {
+          id: sectorId,
         },
       },
     },
   });
+  return users.map((user) => ({ id: user.id, name: user.name }));
+};
 
-  return users.map((user) => ({
-    id: user.id,
-    name: user.name || "",
-    sectorIds: user.sectors.map((sector) => sector.id),
-  }));
+export const getUsersAlreadyHave = async (sectorId: string) => {
+  const users = await prisma.user.findMany({
+    where: {
+      sectors: {
+        some: {
+          id: sectorId,
+        },
+      },
+    },
+  });
+  return users.map((user) => ({ id: user.id, name: user.name }));
 };

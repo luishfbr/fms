@@ -3,11 +3,12 @@
 import {
   DashboardPage,
   DashboardPageHeader,
+  DashboardPageHeaderNav,
   DashboardPageHeaderTitle,
   DashboardPageMain,
 } from "@/components/dashboard/page";
-import { Main } from "./_components/main";
 import { ToastProvider } from "../../utils/ToastContext";
+import { Main } from "./_components/main";
 
 export default function Page() {
   return (
@@ -15,7 +16,7 @@ export default function Page() {
       <DashboardPage>
         <DashboardPageHeader>
           <DashboardPageHeaderTitle>
-            Painel de Desenvolvedor
+            crie um novo modelo
           </DashboardPageHeaderTitle>
         </DashboardPageHeader>
         <DashboardPageMain>

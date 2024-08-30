@@ -27,7 +27,7 @@ import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useState } from "react";
 import RegisterUser from "@/app/(auth)/_actions/register";
-import { useToast } from "../../ToastContext";
+import { useToast } from "../../../../utils/ToastContext";
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
