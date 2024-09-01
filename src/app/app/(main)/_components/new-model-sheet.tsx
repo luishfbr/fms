@@ -40,7 +40,6 @@ type Sector = {
 export function NewModelSheet() {
   const { showToast } = useToast();
   const [modelName, setModelName] = useState<string>("");
-  const [description, setDescription] = useState<string>(""); // Adicionando estado para descrição
   const [fields, setFields] = useState<Field[]>([]);
   const [currentField, setCurrentField] = useState<Field>({
     name: "",
@@ -73,7 +72,6 @@ export function NewModelSheet() {
     if (modelName && fields.length > 0 && selectedSector) {
       const data = {
         name: modelName,
-        description: description, // Passar descrição para a função createModel
         sectorId: selectedSector.id,
       };
 

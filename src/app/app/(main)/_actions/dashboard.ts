@@ -61,3 +61,33 @@ export const getModels = async (sectorId: string) => {
     return response;
   }
 };
+
+export const getFields = async (modelId: string) => {
+  const response = await prisma.fields.findMany({
+    where: {
+      fileTemplateId: modelId,
+    },
+    select: {
+      name: true,
+      type: true,
+      options: {
+        select: {
+          value: true,
+        },
+      },
+      id: true,
+    },
+  });
+
+  return response;
+};
+
+export const getFiles = async (fieldsID: string) => {
+  const response = await prisma.file.findMany({
+    where: {
+      fieldId: fieldsID,
+    },
+  });
+
+  return response;
+};

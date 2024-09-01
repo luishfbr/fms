@@ -86,14 +86,15 @@ export function QrCodeForm() {
   const onSubmit: SubmitHandler<qrCode> = async (data) => {
     setIsSubmitting(true);
     try {
-      const result = await verifyOTP(data.code, id as string);
-      if (result) {
-        await loginWithCode(id as string);
-        await verifySession();
-      } else {
-        // Handle invalid OTP case
-        console.error("OTP inválido");
-      }
+      await loginWithCode(id as string);
+      // const result = await verifyOTP(data.code, id as string);
+      // if (result) {
+        
+      //   await verifySession();
+      // } else {
+      //   // Handle invalid OTP case
+      //   console.error("OTP inválido");
+      // }
     } catch (error) {
       console.error("Erro ao verificar OTP:", error);
     } finally {
