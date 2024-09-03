@@ -15,12 +15,14 @@ import { MainTableAndModel } from "./_components/main-table-and-modle";
 import { NewArchive } from "./_components/new-archive";
 
 export default function Page() {
-  const [havePermission, setHavePermission] = useState<boolean>();
+  const [havePermission, setHavePermission] = useState<boolean>(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const getPermission = async () => {
-      const response = await checkButton();
-      setHavePermission(response);
+      const { id, havePermission } = await checkButton();
+      setHavePermission(havePermission);
+      setUserId(id);
     };
     getPermission();
   }, []);
@@ -30,11 +32,9 @@ export default function Page() {
       <DashboardPage>
         <DashboardPageHeader>
           <DashboardPageHeaderTitle>Arquivos</DashboardPageHeaderTitle>
-          {havePermission ? (
+          {havePermission && userId ? (
             <DashboardPageHeaderNav>
-              <DashboardPageHeaderNav>
-                <NewArchive />
-              </DashboardPageHeaderNav>
+              <NewArchive id={userId} />
             </DashboardPageHeaderNav>
           ) : null}
         </DashboardPageHeader>

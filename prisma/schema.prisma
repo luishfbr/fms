@@ -25,52 +25,26 @@ model User {
 }
 
 model Sector {
-    id            String         @id @default(cuid())
-    name          String         @unique
-    fileTemplates FileTemplate[] //Se precisar pegar os modelos existentes para o setor é só buscar por fileTemplates
-    users         User[]         @relation("UserSectors")
+    id                String              @id @default(cuid())
+    name              String              @unique
+    fileTemplates     FileTemplate[]
+    users             User[]              @relation("UserSectors")
+    WorkContract      WorkContract[]
+    PointArchiveProps PointArchiveProps[]
 
     @@map("sectors")
 }
 
 model FileTemplate {
-    id          String   @id @default(cuid())
-    name        String
-    fieldsModel Fields[]
-    sectorId    String   @map("sector_id")
-    sector      Sector   @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+    id                String              @id @default(cuid())
+    name              String
+    url               String
+    sectorId          String              @map("sector_id")
+    sector            Sector              @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+    WorkContract      WorkContract[]
+    PointArchiveProps PointArchiveProps[]
 
     @@map("fileTemplates")
-}
-
-model Fields {
-    id             String        @id @default(cuid())
-    name           String
-    type           String
-    options        Options[]
-    fileTemplate   FileTemplate? @relation(fields: [fileTemplateId], references: [id], onDelete: Cascade)
-    fileTemplateId String?
-    files          File[]
-
-    @@map("fields")
-}
-
-model Options {
-    id       String  @id @default(cuid())
-    value    String
-    fields   Fields? @relation(fields: [fieldsId], references: [id], onDelete: Cascade)
-    fieldsId String?
-
-    @@map("options")
-}
-
-model File {
-    id      String @id @default(cuid())
-    name    String
-    fieldId String @map("field_id")
-    field   Fields @relation(fields: [fieldId], references: [id], onDelete: Cascade)
-
-    @@map("files")
 }
 
 model Account {
@@ -110,3 +84,40 @@ model VerificationToken {
 
     @@unique([identifier, token])
 }
+
+model WorkContract {
+    id           String       @id @default(cuid())
+    shelf        Int
+    box          Int
+    folder       Int
+    name         String
+    cpf          String
+    registration String
+    addData      String
+    logoutDate   String?
+    sectorId     String       @map("sector_id")
+    sector       Sector       @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+    modelId      String       @map("model_id")
+    model        FileTemplate @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+    @@map("work_contracts")
+}
+
+model PointArchiveProps {
+    id           String       @id @default(cuid())
+    shelf        Int
+    box          Int
+    folder       Int
+    name         String
+    cpf          String
+    registration String
+    month        String
+    year         String
+    sectorId     String       @map("sector_id")
+    sector       Sector       @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+    modelId      String       @map("model_id")
+    model        FileTemplate @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+    @@map("point_archive_props")
+}
+ 

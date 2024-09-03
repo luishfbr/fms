@@ -1,34 +1,21 @@
-export interface TextBox {
-  id: string;
-  value: string;
-}
-
-export interface SelectBox {
-  id: string;
-  value: string;
-  options: options[];
-}
-
-export interface options {
-  value: string;
-}
-
-export interface DataBox {
-  id: string;
-  value: string;
-}
-
-export interface PhoneNumberBox {
-  id: string;
-  value: string;
-}
-
-export interface CpfBox {
-  id: string;
-  value: string;
-}
-
-export interface CnpjBox {
-  id: string;
+export interface WorkContractProps {
+  shelf: number;
+  box: number;
+  folder: number;
   name: string;
+  cpf: string;
+  registration: string;
+  addData: string;
+  logoutDate: string | null;
+}
+
+export interface PointArchiveProps {
+  shelf: number;
+  box: number;
+  folder: number;
+  name: string;
+  cpf: string;
+  registration: string;
+  month: string;
+  year: string;
 }

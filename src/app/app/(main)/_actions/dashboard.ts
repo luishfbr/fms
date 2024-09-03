@@ -13,17 +13,17 @@ export const checkButton = async () => {
       },
       select: {
         role: true,
+        id: true,
       },
     });
 
     console.log(response);
 
     if (response?.role === "creator" || response?.role === "admin") {
-      return true;
+      return { id: response.id, havePermission: true };
     }
-
-    return false;
   }
+  return { id: null, havePermission: false };
 };
 
 export const getSectors = async () => {
@@ -47,47 +47,41 @@ export const getSectors = async () => {
   }
 };
 
-export const getModels = async (sectorId: string) => {
+export const getSectorByUserId = async (id: string) => {
+  const response = await prisma.user.findUnique({
+    where: {
+      id: id,
+    },
+    select: {
+      sectors: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  if (response) {
+    return response.sectors;
+  }
+  return [];
+};
+
+export const getModelsBySectorId = async (sectorId: string) => {
   const response = await prisma.fileTemplate.findMany({
     where: {
       sectorId: sectorId,
     },
-    include: {
-      fieldsModel: true,
+    select: {
+      id: true,
+      name: true,
+      url: true,
     },
   });
 
   if (response) {
     return response;
   }
-};
-
-export const getFields = async (modelId: string) => {
-  const response = await prisma.fields.findMany({
-    where: {
-      fileTemplateId: modelId,
-    },
-    select: {
-      name: true,
-      type: true,
-      options: {
-        select: {
-          value: true,
-        },
-      },
-      id: true,
-    },
-  });
-
-  return response;
-};
-
-export const getFiles = async (fieldsID: string) => {
-  const response = await prisma.file.findMany({
-    where: {
-      fieldId: fieldsID,
-    },
-  });
-
-  return response;
+  return [];
 };

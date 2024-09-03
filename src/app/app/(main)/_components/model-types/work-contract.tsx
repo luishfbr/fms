@@ -1,79 +1,46 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
+import { Core } from "./input-bases.tsx/core";
+import { Name } from "./input-bases.tsx/name";
+import { CPF } from "./input-bases.tsx/cpf";
+import { Matricula } from "./input-bases.tsx/registration";
+import { AddAndLogoutData } from "./input-bases.tsx/add-logout-date";
+import { useForm } from "react-hook-form";
+import { WorkContractProps } from "@/app/types/types";
 
 export const WorkContract = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<WorkContractProps>({});
+
+  const onSubmit = (data: WorkContractProps) => {
+    if (data.logoutDate === "") {
+      data.logoutDate = "Emprego Atual";
+    }
+    console.log(data);
+  };
+
   return (
-    <TabsContent value="account">
-      <Card>
-        <form action="">
-          <CardContent className="space-y-2 mt-4">
-            <div className="grid grid-cols-3 gap-4">
-              <Input
-                className="text-center "
-                placeholder="Prateleira"
-                type="text"
-              />
-              <Input
-                className="text-center "
-                placeholder="Caixa"
-                type="text"
-              />
-              <Input
-                className="text-center "
-                placeholder="Pasta"
-                type="text"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="name">Nome Completo</Label>
-              <Input id="name" name="name" />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="cpf">CPF</Label>
-              <Input id="cpf" name="cpf" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <Label htmlFor="addData">Data de Admissão</Label>
-                <Input type="date" id="addData" name="addData" />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="logoutDate">Data de Rescisão</Label>
-                <Input type="date" id="logoutDate" name="logoutDate" />
-              </div>
-            </div>
-            <div className="flex items-center justify-center text-center">
-              <Label
-                className="text-sm text-muted-foreground"
-                htmlFor="actuality"
-              >
-                Ainda empregado?
-              </Label>
-              <Input
-                className="mx-2 h-3 w-3 cursor-pointer"
-                type="checkbox"
-                id="actuality"
-                name="actuality"
-              />
-            </div>
-          </CardContent>
-          <CardFooter className="grid">
-            <Button>Salvar Arquivo</Button>
-          </CardFooter>
-        </form>
-      </Card>
-    </TabsContent>
+    <Card>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <CardContent className="space-y-4 mt-4 px-4">
+          <Core register={register} />
+          <Name register={register} />
+          <div className="flex gap-4">
+            <CPF register={register} />
+            <Matricula register={register} />
+          </div>
+          <AddAndLogoutData register={register} />
+        </CardContent>
+        <CardFooter className="flex justify-center">
+          <Button type="submit" className="w-full md:w-auto">
+            Salvar Arquivo
+          </Button>
+        </CardFooter>
+      </form>
+    </Card>
   );
 };
