@@ -8,25 +8,45 @@ import { Matricula } from "./input-bases.tsx/registration";
 import { AddAndLogoutData } from "./input-bases.tsx/add-logout-date";
 import { useForm } from "react-hook-form";
 import { WorkContractProps } from "@/app/types/types";
+import { saveWorkContract } from "../../_actions/dashboard";
+import { useToast } from "@/app/utils/ToastContext";
 
-export const WorkContract = () => {
+interface WorkContractPropsTeste {
+  ModelId: string;
+  SectorId: string;
+}
+
+export const WorkContract: React.FC<WorkContractPropsTeste> = ({
+  ModelId,
+  SectorId,
+}) => {
+  const { showToast } = useToast();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<WorkContractProps>({});
 
-  const onSubmit = (data: WorkContractProps) => {
+  const onSubmit = async (data: WorkContractProps) => {
     if (data.logoutDate === "") {
       data.logoutDate = "Emprego Atual";
     }
-    console.log(data);
+    const response = await saveWorkContract(data);
+    if (response) {
+      showToast("Arquivo salvo com sucesso!");
+    }
   };
 
   return (
     <Card>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4 mt-4 px-4">
+          <input
+            type="text"
+            className="sr-only"
+            value={ModelId}
+            {...register("fileTemplateId")}
+          />
           <Core register={register} />
           <Name register={register} />
           <div className="flex gap-4">

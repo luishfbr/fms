@@ -41,7 +41,7 @@ export type Sector = {
 
 export type Model = {
   id: string;
-  name: string;
+  modelName: string;
   url: string;
 };
 
@@ -129,7 +129,7 @@ export const NewArchive: React.FC<NewArchiveProps> = ({ id }) => {
                 <SelectGroup>
                   {models.map((model, index) => (
                     <SelectItem key={index} value={model.id}>
-                      {model.name}
+                      {model.modelName}
                     </SelectItem>
                   ))}
                 </SelectGroup>

@@ -15,8 +15,18 @@ export const SelectedSectorModels: React.FC<SelectedSectorModelsProps> = ({
     <div>
       {selectedModel && selectedSector && (
         <>
-          {selectedModel.name.includes("Contrato") && <WorkContract />}
-          {selectedModel.name.includes("Folha") && <PointArchive />}
+          {selectedModel.modelName.includes("Contrato") && (
+            <WorkContract
+              ModelId={selectedModel.id}
+              SectorId={selectedSector.id}
+            />
+          )}
+          {selectedModel.modelName.includes("Folha") && (
+            <PointArchive
+              ModelId={selectedModel.id}
+              SectorId={selectedSector.id}
+            />
+          )}
         </>
       )}
     </div>

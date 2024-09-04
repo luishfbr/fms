@@ -1,5 +1,6 @@
 "use server";
 
+import { WorkContractProps } from "@/app/types/types";
 import { prisma } from "@/app/utils/prisma";
 import { auth } from "@/services/auth";
 
@@ -75,7 +76,7 @@ export const getModelsBySectorId = async (sectorId: string) => {
     },
     select: {
       id: true,
-      name: true,
+      modelName: true,
       url: true,
     },
   });
@@ -84,4 +85,13 @@ export const getModelsBySectorId = async (sectorId: string) => {
     return response;
   }
   return [];
+};
+
+export const saveWorkContract = async (data: WorkContractProps) => {
+  const response = await prisma.fields.create({
+    data,
+  });
+  if (response) {
+    return true;
+  }
 };

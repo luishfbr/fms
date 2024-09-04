@@ -1,12 +1,13 @@
 export interface WorkContractProps {
-  shelf: number;
-  box: number;
-  folder: number;
+  shelf: string;
+  box: string;
+  folder: string;
   name: string;
   cpf: string;
   registration: string;
   addData: string;
   logoutDate: string | null;
+  fileTemplateId: string;
 }
 
 export interface PointArchiveProps {

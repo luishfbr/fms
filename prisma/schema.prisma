@@ -25,26 +25,43 @@ model User {
 }
 
 model Sector {
-    id                String              @id @default(cuid())
-    name              String              @unique
-    fileTemplates     FileTemplate[]
-    users             User[]              @relation("UserSectors")
-    WorkContract      WorkContract[]
-    PointArchiveProps PointArchiveProps[]
+    id           String         @id @default(cuid())
+    name         String         @unique
+    users        User[]         @relation("UserSectors")
+    FileTemplate FileTemplate[]
 
     @@map("sectors")
 }
 
 model FileTemplate {
-    id                String              @id @default(cuid())
-    name              String
-    url               String
-    sectorId          String              @map("sector_id")
-    sector            Sector              @relation(fields: [sectorId], references: [id], onDelete: Cascade)
-    WorkContract      WorkContract[]
-    PointArchiveProps PointArchiveProps[]
+    id        String   @id @default(cuid())
+    url       String?
+    modelName String?
+    sectorId  String   @map("sector_id")
+    sector    Sector   @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+    Fields    Fields[]
 
     @@map("fileTemplates")
+}
+
+model Fields {
+    id             String       @id @default(cuid())
+    shelf          String?
+    box            String?
+    folder         String?
+    name           String?
+    cpf            String?
+    cnpj           String?
+    registration   String?
+    addData        String?
+    logoutDate     String?
+    month          String?
+    year           String?
+    description    String?
+    fileTemplate   FileTemplate @relation(fields: [fileTemplateId], references: [id], onDelete: Cascade)
+    fileTemplateId String       @map("fileTemplate_id")
+
+    @@map("fields")
 }
 
 model Account {
@@ -84,40 +101,3 @@ model VerificationToken {
 
     @@unique([identifier, token])
 }
-
-model WorkContract {
-    id           String       @id @default(cuid())
-    shelf        Int
-    box          Int
-    folder       Int
-    name         String
-    cpf          String
-    registration String
-    addData      String
-    logoutDate   String?
-    sectorId     String       @map("sector_id")
-    sector       Sector       @relation(fields: [sectorId], references: [id], onDelete: Cascade)
-    modelId      String       @map("model_id")
-    model        FileTemplate @relation(fields: [modelId], references: [id], onDelete: Cascade)
-
-    @@map("work_contracts")
-}
-
-model PointArchiveProps {
-    id           String       @id @default(cuid())
-    shelf        Int
-    box          Int
-    folder       Int
-    name         String
-    cpf          String
-    registration String
-    month        String
-    year         String
-    sectorId     String       @map("sector_id")
-    sector       Sector       @relation(fields: [sectorId], references: [id], onDelete: Cascade)
-    modelId      String       @map("model_id")
-    model        FileTemplate @relation(fields: [modelId], references: [id], onDelete: Cascade)
-
-    @@map("point_archive_props")
-}
- 
