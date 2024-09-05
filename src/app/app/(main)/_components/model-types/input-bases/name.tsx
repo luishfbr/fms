@@ -1,12 +1,6 @@
-import { WorkContractProps, PointArchiveProps } from "@/app/types/types";
 import { Input } from "@/components/ui/input";
-import { UseFormRegister } from "react-hook-form";
 
-interface NameProps {
-  register: UseFormRegister<WorkContractProps | PointArchiveProps>;
-}
-
-export const Name: React.FC<NameProps> = ({ register }) => {
+export const Name = () => {
   return (
     <div>
       <div className="space-y-1">
@@ -16,7 +10,6 @@ export const Name: React.FC<NameProps> = ({ register }) => {
           type="text"
           id="name"
           autoComplete="off"
-          {...register("name")}
           required
         />
       </div>

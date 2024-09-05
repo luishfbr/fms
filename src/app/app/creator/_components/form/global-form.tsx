@@ -8,9 +8,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Core } from "@/app/app/(main)/_components/model-types/input-bases.tsx/core";
 import { useForm } from "react-hook-form";
 import { WorkContractProps } from "@/app/types/types";
+import { AddAndLogoutData } from "@/app/app/(main)/_components/model-types/input-bases/add-logout-date";
+import { CNPJ } from "@/app/app/(main)/_components/model-types/input-bases/cnpj";
+import { Core } from "@/app/app/(main)/_components/model-types/input-bases/core";
+import { CPF } from "@/app/app/(main)/_components/model-types/input-bases/cpf";
+import { EnterpriseName } from "@/app/app/(main)/_components/model-types/input-bases/enterprise-name";
+import { Month } from "@/app/app/(main)/_components/model-types/input-bases/month";
+import { Name } from "@/app/app/(main)/_components/model-types/input-bases/name";
+import { Matricula } from "@/app/app/(main)/_components/model-types/input-bases/registration";
+import { Year } from "@/app/app/(main)/_components/model-types/input-bases/year";
 
 interface Models {
   id: string;
@@ -70,8 +78,16 @@ export const GlobalForm = ({
             </span>
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-col gap-6">
           <Core />
+          <Name />
+          <EnterpriseName />
+          <CPF />
+          <CNPJ />
+          <Matricula />
+          <Month />
+          <Year />
+          <AddAndLogoutData />
         </CardContent>
         <CardFooter className="flex items-center justify-center">
           <Button type="submit" className="w-full md:w-auto">

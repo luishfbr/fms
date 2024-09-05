@@ -1,15 +1,7 @@
 import InputMask from "react-input-mask";
-
-import { UseFormRegister } from "react-hook-form";
-
 import styles from "@/app/app/styles/main.module.css";
-import { PointArchiveProps, WorkContractProps } from "@/app/types/types";
 
-interface CpfProps {
-  register: UseFormRegister<WorkContractProps | PointArchiveProps>;
-}
-
-export const CPF: React.FC<CpfProps> = ({ register }) => {
+export const CPF = () => {
   return (
     <div className="space-y-1">
       <InputMask
@@ -17,7 +9,6 @@ export const CPF: React.FC<CpfProps> = ({ register }) => {
         type="text"
         mask="999-999-999/99"
         className={styles.inputStyles}
-        {...register("cpf")}
         autoComplete="off"
         required
       />

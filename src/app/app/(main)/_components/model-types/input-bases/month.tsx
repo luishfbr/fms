@@ -1,12 +1,6 @@
-import { PointArchiveProps, WorkContractProps } from "@/app/types/types";
 import { Input } from "@/components/ui/input";
-import { UseFormRegister } from "react-hook-form";
 
-interface MonthProps {
-  register: UseFormRegister<WorkContractProps | PointArchiveProps>;
-}
-
-export const Month: React.FC<MonthProps> = ({ register }) => {
+export const Month = () => {
   return (
     <div>
       <div className="space-y-1">
@@ -16,7 +10,6 @@ export const Month: React.FC<MonthProps> = ({ register }) => {
           type="text"
           id="month"
           autoComplete="off"
-          {...register("month")}
           required
         />
       </div>
