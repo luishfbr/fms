@@ -1,4 +1,5 @@
 export interface WorkContractProps {
+  id: string;
   shelf: string;
   box: string;
   folder: string;
@@ -11,6 +12,7 @@ export interface WorkContractProps {
 }
 
 export interface PointArchiveProps {
+  id: string;
   shelf: number;
   box: number;
   folder: number;

@@ -8,7 +8,7 @@ import {
   DashboardPageMain,
 } from "@/components/dashboard/page";
 import { ToastProvider } from "../../utils/ToastContext";
-import { Main } from "./_components/main";
+import { Main } from "./main";
 
 export default function Page() {
   return (
@@ -16,7 +16,7 @@ export default function Page() {
       <DashboardPage>
         <DashboardPageHeader>
           <DashboardPageHeaderTitle>
-            crie um novo modelo
+            Painel de Criação de Arquivos
           </DashboardPageHeaderTitle>
         </DashboardPageHeader>
         <DashboardPageMain>

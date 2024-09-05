@@ -95,3 +95,74 @@ export const saveWorkContract = async (data: WorkContractProps) => {
     return true;
   }
 };
+
+export const getWorkContractByIdModel = async (id: string) => {
+  const response = await prisma.fields.findMany({
+    where: {
+      fileTemplateId: id,
+    },
+    select: {
+      id: true,
+      shelf: true,
+      box: true,
+      folder: true,
+      name: true,
+      cpf: true,
+      registration: true,
+      addData: true,
+      logoutDate: true,
+    },
+  });
+  if (response) {
+    return response;
+  }
+  return [];
+};
+
+export const getTableWorkContract = async (id: string) => {
+  const response = await prisma.fields.findMany({
+    where: {
+      fileTemplateId: id,
+    },
+    select: {
+      id: true,
+      shelf: true,
+      box: true,
+      folder: true,
+      name: true,
+      cpf: true,
+      registration: true,
+      addData: true,
+      logoutDate: true,
+    },
+  });
+  if (response) {
+    return response;
+  }
+  return [];
+};
+
+export const getTablePoint = async (id: string) => {
+  const response = await prisma.fields.findMany({
+    where: {
+      fileTemplateId: id,
+    },
+    select: {
+      id: true,
+      shelf: true,
+      box: true,
+      folder: true,
+      name: true,
+      cpf: true,
+      registration: true,
+      addData: true,
+      logoutDate: true,
+      month: true,
+      year: true,
+    },
+  });
+  if (response) {
+    return response;
+  }
+  return [];
+};

@@ -4,16 +4,7 @@ import { useState } from "react";
 import InputMask from "react-input-mask";
 import styles from "@/app/app/styles/main.module.css";
 
-import { UseFormRegister } from "react-hook-form";
-import { WorkContractProps } from "../work-contract";
-
-interface AddAndLogoutDataProps {
-  register: UseFormRegister<WorkContractProps>;
-}
-
-export const AddAndLogoutData: React.FC<AddAndLogoutDataProps> = ({
-  register,
-}) => {
+export const AddAndLogoutData = () => {
   const [isEmployed, setIsEmployed] = useState(false);
 
   const handleCheckboxChange = (event: any) => {
@@ -29,7 +20,6 @@ export const AddAndLogoutData: React.FC<AddAndLogoutDataProps> = ({
             placeholder="Data de Admissão"
             type="text"
             id="addData"
-            {...register("addData")}
             autoComplete="off"
             required
           />
@@ -41,7 +31,6 @@ export const AddAndLogoutData: React.FC<AddAndLogoutDataProps> = ({
             placeholder="Data de Rescisão"
             type="text"
             id="logoutDate"
-            {...register("logoutDate")}
             autoComplete="off"
             disabled={isEmployed}
           />
