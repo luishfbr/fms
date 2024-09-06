@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
-import { WorkContractProps } from "@/app/types/types";
+import { InputBaseProps, WorkContractProps } from "@/app/types/types";
 import { AddAndLogoutData } from "@/app/app/(main)/_components/model-types/input-bases/add-logout-date";
 import { CNPJ } from "@/app/app/(main)/_components/model-types/input-bases/cnpj";
 import { Core } from "@/app/app/(main)/_components/model-types/input-bases/core";
@@ -33,42 +33,18 @@ export const GlobalForm = ({
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
-  } = useForm<WorkContractProps>({});
-  const [formState, setFormState] = useState({
-    field1: "",
-    field2: "",
-    field3: "",
-  });
+  } = useForm<InputBaseProps>({});
 
-  useEffect(() => {
-    if (selectedModel) {
-      if (selectedModel.modelName === "Contrato de Trabalho") {
-        setFormState((prevState) => ({
-          ...prevState,
-          field1: "Predefined Value for Contrato de Trabalho",
-        }));
-      } else {
-        setFormState({
-          field1: "",
-          field2: "",
-          field3: "",
-        });
-      }
-    }
-  }, [selectedModel]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormState((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+  const onSubmit = (data: InputBaseProps) => {
+    console.log(data);
+    reset();
   };
 
   return (
     <Card className="p-6">
-      <form className="space-y-4">
+      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         <CardHeader className="flex items-center justify-between gap-4">
           <CardTitle>Crie seu novo arquivo</CardTitle>
           <CardDescription>
@@ -79,15 +55,15 @@ export const GlobalForm = ({
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
-          <Core />
-          <Name />
-          <EnterpriseName />
-          <CPF />
-          <CNPJ />
-          <Matricula />
-          <Month />
-          <Year />
-          <AddAndLogoutData />
+          <Core register={register} />
+          <Name register={register} />
+          <EnterpriseName register={register} />
+          <CPF register={register} />
+          <CNPJ register={register} />
+          <Matricula register={register} />
+          <Month register={register} />
+          <Year register={register} />
+          <AddAndLogoutData register={register} />
         </CardContent>
         <CardFooter className="flex items-center justify-center">
           <Button type="submit" className="w-full md:w-auto">

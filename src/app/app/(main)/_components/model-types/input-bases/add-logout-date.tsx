@@ -4,7 +4,7 @@ import { useState } from "react";
 import InputMask from "react-input-mask";
 import styles from "@/app/app/styles/main.module.css";
 
-export const AddAndLogoutData = () => {
+export const AddAndLogoutData = ({ register }: { register: any }) => {
   const [isEmployed, setIsEmployed] = useState(false);
 
   const handleCheckboxChange = (event: any) => {
@@ -15,6 +15,7 @@ export const AddAndLogoutData = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-1">
           <InputMask
+            {...register("addData")}
             mask="99/99/9999"
             className={styles.inputStyles}
             placeholder="Data de Admissão"
@@ -26,6 +27,7 @@ export const AddAndLogoutData = () => {
         </div>
         <div className="space-y-1">
           <InputMask
+            {...register("logoutDate")}
             mask="99/99/9999"
             className={styles.inputStyles}
             placeholder="Data de Rescisão"

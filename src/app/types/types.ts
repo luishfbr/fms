@@ -22,3 +22,17 @@ export interface PointArchiveProps {
   month: string;
   year: string;
 }
+
+export interface InputBaseProps {
+  shelf: string | null;
+  box: string | null;
+  folder: string | null;
+  name: string | null;
+  cpf: string | null;
+  cnpj: string | null;
+  registration: string | null;
+  month: string | null;
+  year: string | null;
+  addData: string | null;
+  logoutDate: string | null;
+}
