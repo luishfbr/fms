@@ -65,14 +65,6 @@ export function MainSidebar({ user }: MainSidebarProps) {
             <DashboardSidebarNavLink href="/app" active={isActive("/app")}>
               Tabela de Arquivos
             </DashboardSidebarNavLink>
-            {isCreator || isAdmin ? (
-              <DashboardSidebarNavLink
-                href="/app/creator"
-                active={isActive("/app/creator")}
-              >
-                Novo Arquivo
-              </DashboardSidebarNavLink>
-            ) : null}
             {isAdmin ? (
               <DashboardSidebarNavLink
                 href="/app/admin"

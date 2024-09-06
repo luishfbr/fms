@@ -166,3 +166,46 @@ export const getTablePoint = async (id: string) => {
   }
   return [];
 };
+
+export const User = async () => {
+  const session = await auth();
+  if (session?.user) {
+    const email = session.user.email as string;
+    const response = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        id: true,
+        role: true,
+      },
+    });
+
+    const data = {
+      id: response?.id as string,
+      role: response?.role as string,
+    };
+
+    return data;
+  }
+};
+
+export const getSectorsById = async (id: string) => {
+  const response = await prisma.user.findUnique({
+    where: {
+      id: id,
+    },
+    select: {
+      sectors: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+  if (response) {
+    return response.sectors;
+  }
+  return [];
+};
