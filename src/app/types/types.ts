@@ -13,14 +13,15 @@ export interface WorkContractProps {
 
 export interface PointArchiveProps {
   id: string;
-  shelf: number;
-  box: number;
-  folder: number;
+  shelf: string;
+  box: string;
+  folder: string;
   name: string;
   cpf: string;
   registration: string;
   month: string;
   year: string;
+  fileTemplateId: string;
 }
 
 export interface InputBaseProps {

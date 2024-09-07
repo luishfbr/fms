@@ -12,6 +12,19 @@ export const AddAndLogoutData = ({ register }: { register: any }) => {
   };
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-center text-center space-x-2">
+        <Label className="text-sm text-muted-foreground" htmlFor="actuality">
+          Ainda empregado?
+        </Label>
+        <Input
+          className="h-4 w-4 cursor-pointer"
+          type="checkbox"
+          id="actuality"
+          name="actuality"
+          checked={isEmployed}
+          onChange={handleCheckboxChange}
+        />
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-1">
           <InputMask
@@ -37,19 +50,6 @@ export const AddAndLogoutData = ({ register }: { register: any }) => {
             disabled={isEmployed}
           />
         </div>
-      </div>
-      <div className="flex items-center justify-center text-center space-x-2">
-        <Label className="text-sm text-muted-foreground" htmlFor="actuality">
-          Ainda empregado?
-        </Label>
-        <Input
-          className="h-4 w-4 cursor-pointer"
-          type="checkbox"
-          id="actuality"
-          name="actuality"
-          checked={isEmployed}
-          onChange={handleCheckboxChange}
-        />
       </div>
     </div>
   );

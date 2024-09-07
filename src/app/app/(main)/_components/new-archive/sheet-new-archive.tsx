@@ -1,12 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -14,15 +10,13 @@ import {
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
 import { getModelsBySectorId, getSectorsById } from "../../_actions/dashboard";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SelectedModelCard } from "../model-types/models-card/main";
 
 interface Sector {
   id: string;
@@ -38,21 +32,73 @@ export function SheetNewArchive({ id }: { id: string }) {
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [selectedSector, setSelectedSector] = useState<Sector | null>(null);
   const [models, setModels] = useState<Model[]>([]);
+  const [selectedModel, setSelectedModel] = useState<Model | null>(null);
+  const [loadingSectors, setLoadingSectors] = useState<boolean>(false);
+  const [loadingModels, setLoadingModels] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false); // Controla o estado de abertura do Sheet
 
-  const ModelByIdSector = async (sectorId: string) => {
-    const response = await getModelsBySectorId(sectorId);
-    setModels(response);
+  const handleChangeModel = async (modelId: string) => {
+    try {
+      setLoadingModels(true);
+      const selected = models.find((model) => model.id === modelId) || null;
+      setSelectedModel(selected);
+      console.log(selected);
+    } catch (err) {
+      setError("Error fetching models. Please try again.");
+    } finally {
+      setLoadingModels(false);
+    }
+  };
+
+  const handleChangeSector = async (sectorId: string) => {
+    try {
+      setLoadingModels(true);
+      const selected = sectors.find((sector) => sector.id === sectorId) || null;
+      setSelectedSector(selected);
+      if (selected) {
+        const response = await getModelsBySectorId(selected.id);
+        setModels(response);
+      }
+    } catch (err) {
+      setError("Error fetching models. Please try again.");
+    } finally {
+      setLoadingModels(false);
+    }
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      const fetchedSectors = await getSectorsById(id);
-      setSectors(fetchedSectors);
+      try {
+        setLoadingSectors(true);
+        const fetchedSectors = await getSectorsById(id);
+        setSectors(fetchedSectors);
+      } catch (err) {
+        setError("Error fetching sectors. Please try again.");
+      } finally {
+        setLoadingSectors(false);
+      }
     };
     fetchData();
-  }, []);
+  }, [id]);
+
+  const resetSelections = () => {
+    setSelectedSector(null);
+    setSelectedModel(null);
+    setModels([]);
+    setError(null);
+  };
+
   return (
-    <Sheet>
+    <Sheet
+      open={isSheetOpen}
+      onOpenChange={(isOpen) => {
+        setIsSheetOpen(isOpen);
+        if (!isOpen) {
+          resetSelections();
+        }
+      }}
+    >
       <SheetTrigger asChild>
         <Button>Criar Arquivo</Button>
       </SheetTrigger>
@@ -64,38 +110,50 @@ export function SheetNewArchive({ id }: { id: string }) {
           </SheetDescription>
         </SheetHeader>
         <div className="grid grid-cols-2 my-4 gap-6">
-          <Select onValueChange={ModelByIdSector}>
+          {/* Sector Selection */}
+          <Select onValueChange={handleChangeSector}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Selecione um Setor" />
+              <SelectValue
+                placeholder={
+                  loadingSectors
+                    ? "Carregando setores..."
+                    : "Selecione um Setor"
+                }
+              />
             </SelectTrigger>
             <SelectContent>
-              {sectors.map((sector, index) => (
-                <SelectGroup key={index}>
-                  <SelectItem value={sector.id}>{sector.name}</SelectItem>
-                </SelectGroup>
+              {sectors.map((sector) => (
+                <SelectItem key={sector.id} value={sector.id}>
+                  {sector.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
+
+          {/* Model Selection */}
           {selectedSector && (
-            <Select onValueChange={ModelByIdSector}>
+            <Select onValueChange={handleChangeModel}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Selecione um Modelo" />
+                <SelectValue
+                  placeholder={
+                    loadingModels
+                      ? "Carregando modelos..."
+                      : "Selecione um Modelo"
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
-                {models.map((model, index) => (
-                  <SelectGroup key={index}>
-                    <SelectItem value={model.id}>{model.modelName}</SelectItem>
-                  </SelectGroup>
+                {models.map((model) => (
+                  <SelectItem key={model.id} value={model.id}>
+                    {model.modelName}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           )}
         </div>
-        {/* <SheetFooter>
-          <SheetClose asChild>
-            <Button type="submit">Save changes</Button>
-          </SheetClose>
-        </SheetFooter> */}
+        {error && <p className="text-red-500">{error}</p>}
+        {selectedModel && <SelectedModelCard selectedModel={selectedModel} />}
       </SheetContent>
     </Sheet>
   );

@@ -1,6 +1,6 @@
 "use server";
 
-import { WorkContractProps } from "@/app/types/types";
+import { PointArchiveProps, WorkContractProps } from "@/app/types/types";
 import { prisma } from "@/app/utils/prisma";
 import { auth } from "@/services/auth";
 
@@ -44,7 +44,11 @@ export const getSectors = async () => {
         },
       },
     });
-    return response;
+    if (response) {
+      return response.sectors;
+    } else {
+      return [];
+    }
   }
 };
 
@@ -87,12 +91,31 @@ export const getModelsBySectorId = async (sectorId: string) => {
   return [];
 };
 
-export const saveWorkContract = async (data: WorkContractProps) => {
+export const saveWorkContract = async (data: WorkContractProps, id: string) => {
   const response = await prisma.fields.create({
-    data,
+    data: { ...data, fileTemplateId: id },
   });
   if (response) {
     return true;
+  }
+};
+
+export const savePointArchive = async (data: PointArchiveProps, id: string) => {
+  try {
+    const response = await prisma.fields.create({
+      data: { ...data, fileTemplateId: id },
+    });
+
+    if (response) {
+      console.log("Arquivo salvo com sucesso:", response);
+      return true;
+    } else {
+      console.error("Erro ao salvar o arquivo: Nenhuma resposta.");
+      return false;
+    }
+  } catch (error) {
+    console.error("Erro ao salvar o arquivo:", error);
+    return false;
   }
 };
 
@@ -208,4 +231,46 @@ export const getSectorsById = async (id: string) => {
     return response.sectors;
   }
   return [];
+};
+
+export const getValuesModel = async (id: string) => {
+  const response = await prisma.fields.findMany({
+    where: {
+      fileTemplateId: id,
+    },
+    select: {
+      name: true,
+    },
+  });
+  if (response) {
+    return response;
+  }
+  return [];
+};
+
+export const deleteWorkContract = async (id: string) => {
+  const response = await prisma.fields.delete({
+    where: {
+      id: id,
+    },
+  });
+  if (response) {
+    return true;
+  }
+  return false;
+};
+
+export const updateWorkContract = async (data: WorkContractProps) => {
+  const response = await prisma.fields.update({
+    where: {
+      id: data.id,
+    },
+    data: {
+      ...data,
+    },
+  });
+  if (response) {
+    return true;
+  }
+  return false;
 };

@@ -8,7 +8,7 @@ import {
   DashboardPageMain,
 } from "@/components/dashboard/page";
 import { ToastProvider } from "@/app/utils/ToastContext";
-import { MainTableAndModel } from "./_components/main-table-and-modle";
+import { ContainerTables } from "./_components/container-tables";
 import { SheetNewArchive } from "./_components/new-archive/sheet-new-archive";
 import { User } from "./_actions/dashboard";
 import { useEffect, useState } from "react";
@@ -39,7 +39,7 @@ export default function Page() {
           ) : null}
         </DashboardPageHeader>
         <DashboardPageMain>
-          <MainTableAndModel />
+          <ContainerTables />
         </DashboardPageMain>
       </DashboardPage>
     </ToastProvider>
