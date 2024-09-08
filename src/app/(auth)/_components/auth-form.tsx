@@ -1,14 +1,12 @@
 "use client";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
 import { LoginForm } from "./login-form";
 import { RegisterForm } from "./register-form";
-import { auth } from "@/services/auth";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { ToastProvider } from "@/app/utils/ToastContext";
-import { VerifySession } from "../_actions/auth";
 import { useEffect } from "react";
+import { VerifySession } from "../_actions/login";
 
 export const AuthForm = () => {
   const router = useRouter();
@@ -27,7 +25,9 @@ export const AuthForm = () => {
         <Tabs defaultValue="login" className="w-[500px] ">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Entrar</TabsTrigger>
-            <TabsTrigger value="register">Registrar</TabsTrigger>
+            <TabsTrigger disabled value="register">
+              Registrar
+            </TabsTrigger>
           </TabsList>
           <LoginForm />
           <RegisterForm />

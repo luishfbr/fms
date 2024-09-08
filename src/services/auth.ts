@@ -1,10 +1,9 @@
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/app/utils/prisma";
-import GitHub from "next-auth/providers/github";
-import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import { authenticator } from "otplib";
+import { compareSync } from "bcrypt-ts";
 
 export const {
   handlers: { GET, POST },
@@ -20,47 +19,37 @@ export const {
     newUser: "/",
   },
   adapter: PrismaAdapter(prisma),
-  session: {
-    strategy: "jwt",
-  },
   providers: [
-    GitHub({
-      clientId: process.env.AUTH_GITHUB_ID,
-      clientSecret: process.env.AUTH_GITHUB_SECRET,
-    }),
-    Google({
-      clientId: process.env.AUTH_GOOGLE_ID,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET,
-    }),
     Credentials({
       credentials: {
-        code: {},
-        id: {},
+        email: {},
+        password: {},
       },
       authorize: async (credentials) => {
-        const code = credentials?.code as string;
-        const id = credentials?.id as string;
+        const email = credentials?.email as string;
+
+        if (!email) {
+          throw new Error("Email is required");
+        }
 
         const user = await prisma.user.findUnique({
-          where: {
-            id,
-          },
+          where: { email },
         });
 
-        if (!user || !user.otpSecret) {
-          return null;
+        if (!user) {
+          throw new Error("Usuário não encontrado");
         }
 
-        const isValid = authenticator.verify({
-          token: code,
-          secret: user.otpSecret,
-        });
+        const isValid = compareSync(
+          credentials.password as string,
+          user.password as string
+        );
 
-        if (isValid) {
-          return user;
-        } else {
-          return null;
+        if (!isValid) {
+          throw new Error("Senha incorreta");
         }
+
+        return user;
       },
     }),
   ],
