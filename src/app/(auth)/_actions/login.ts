@@ -5,8 +5,12 @@ import { signIn, signOut } from "@/services/auth";
 import { compareSync } from "bcrypt-ts";
 import { revalidatePath } from "next/cache";
 
-export const login = async (provider: string) => {
-  await signIn(provider, { redirectTo: "/app" });
+export const login = async (formData: FormData) => {
+  await signIn("credentials", {
+    email: formData.get("email") as string,
+    password: formData.get("password") as string,
+    redirectTo: "/app",
+  });
   revalidatePath("/");
 };
 

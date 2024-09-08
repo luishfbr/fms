@@ -2,12 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  getUserById,
-  loginWithCode,
-  verifyOTP,
-  verifySession,
-} from "../_actions/qrcode";
+import { getUserById, loginWithCode, verifySession } from "../_actions/qrcode";
 import { useEffect, useState } from "react";
 import qrcode from "qrcode";
 import {
@@ -24,9 +19,10 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { Toaster } from "@/components/ui/toaster";
 import Image from "next/image";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useToast } from "@/app/utils/ToastContext";
+import { Input } from "@/components/ui/input";
 
 interface qrCode {
   code: string;
@@ -34,23 +30,20 @@ interface qrCode {
 }
 
 export function QrCodeForm() {
+  const { showToast } = useToast();
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
 
   const {
     handleSubmit,
-    setValue,
+    register,
     formState: { errors, isValid },
   } = useForm<qrCode>({
-    mode: "onChange", // Validação em tempo real
+    mode: "onChange",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [qrCodeImage, setQrCodeImage] = useState<string | null>(null);
-
-  const handleOTPChange = (value: string) => {
-    setValue("code", value, { shouldValidate: true });
-  };
 
   const getUser = async () => {
     if (!id) {
@@ -86,15 +79,13 @@ export function QrCodeForm() {
   const onSubmit: SubmitHandler<qrCode> = async (data) => {
     setIsSubmitting(true);
     try {
-      await loginWithCode(id as string);
-      // const result = await verifyOTP(data.code, id as string);
-      // if (result) {
-        
-      //   await verifySession();
-      // } else {
-      //   // Handle invalid OTP case
-      //   console.error("OTP inválido");
-      // }
+      const login = await loginWithCode(data);
+      if (login) {
+        showToast("Código de autenticação verificado com sucesso");
+        await verifySession();
+      } else {
+        showToast("Código de autenticação inválido");
+      }
     } catch (error) {
       console.error("Erro ao verificar OTP:", error);
     } finally {
@@ -131,19 +122,13 @@ export function QrCodeForm() {
           <CardContent className="space-y-2">
             <div className="space-y-1 flex items-center justify-center text-center flex-col gap-4">
               <Label htmlFor="code">Insira o Código de 6 dígitos</Label>
-              <InputOTP maxLength={6} onChange={handleOTPChange}>
-                <InputOTPGroup>
-                  <InputOTPSlot index={0} />
-                  <InputOTPSlot index={1} />
-                  <InputOTPSlot index={2} />
-                </InputOTPGroup>
-                <InputOTPSeparator />
-                <InputOTPGroup>
-                  <InputOTPSlot index={3} />
-                  <InputOTPSlot index={4} />
-                  <InputOTPSlot index={5} />
-                </InputOTPGroup>
-              </InputOTP>
+              <Input className="w-44" {...register("code")} type="text" />
+              <Input
+                className="sr-only"
+                {...register("id")}
+                type="text"
+                value={id as string}
+              />
               {errors.code && (
                 <p className="text-red-700 text-sm">{errors.code.message}</p>
               )}
@@ -156,7 +141,6 @@ export function QrCodeForm() {
           </CardFooter>
         </form>
       </Card>
-      <Toaster />
     </div>
   );
 }

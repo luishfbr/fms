@@ -5,6 +5,11 @@ import { prisma } from "@/app/utils/prisma";
 import { auth, signIn } from "@/services/auth";
 import { redirect } from "next/navigation";
 
+interface User {
+  code: string;
+  id: string;
+}
+
 export const getUserById = async (id: string) => {
   try {
     const user = await prisma.user.findUnique({
@@ -30,8 +35,6 @@ export const verifyOTP = async (token: string, id: string) => {
     if (!user) throw new Error("Usuário não encontrado.");
 
     const otpSecret = user.otpSecret as string;
-    const email = user.email as string;
-    const password = user.password as string;
     const checkOTP = authenticator.check(token, otpSecret);
 
     if (checkOTP) {
@@ -56,10 +59,8 @@ export const verifyOTP = async (token: string, id: string) => {
   }
 };
 
-export const loginWithCode = async (id: string) => {
-  const user = await getUserById(id);
-  const email = user?.email;
-  await signIn("credentials", { email });
+export const loginWithCode = async (data: User) => {
+  await signIn("credentials", { data });
 };
 
 export const verifySession = async () => {

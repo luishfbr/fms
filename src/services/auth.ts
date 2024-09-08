@@ -4,7 +4,7 @@ import { prisma } from "@/app/utils/prisma";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
-import { compareSync } from "bcrypt-ts";
+import { authenticator } from "otplib";
 
 export const {
   handlers: { GET, POST },
@@ -34,29 +34,33 @@ export const {
     }),
     Credentials({
       credentials: {
-        email: {},
+        code: {},
+        id: {},
       },
       authorize: async (credentials) => {
-        const email = credentials.email as string;
+        const code = credentials?.code as string;
+        const id = credentials?.id as string;
+
         const user = await prisma.user.findUnique({
           where: {
-            email,
+            id,
           },
         });
 
-        if (!user) {
+        if (!user || !user.otpSecret) {
           return null;
         }
 
-        // if (password) {
-        //   const valid = compareSync(password, user.password as string);
+        const isValid = authenticator.verify({
+          token: code,
+          secret: user.otpSecret,
+        });
 
-        //   if (!valid) {
-        //     return null;
-        //   }
-        // }
-
-        return user;
+        if (isValid) {
+          return user;
+        } else {
+          return null;
+        }
       },
     }),
   ],
