@@ -126,7 +126,7 @@ export const TableWorkContract = () => {
                   {/* Botão de Editar */}
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button className="flex gap-2 w-20">
+                      <Button className="flex gap-2 w-32">
                         <Pencil className="w-5 h-5" />
                         Editar
                       </Button>
@@ -218,7 +218,7 @@ export const TableWorkContract = () => {
                     <AlertDialogTrigger asChild>
                       <Button
                         variant={"destructive"}
-                        className="flex gap-2 w-20"
+                        className="flex gap-2 w-32"
                       >
                         <Trash className="w-5 h-5" />
                         Excluir
