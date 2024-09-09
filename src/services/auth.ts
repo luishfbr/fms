@@ -23,30 +23,22 @@ export const {
     Credentials({
       credentials: {
         email: {},
-        password: {},
       },
       authorize: async (credentials) => {
+        let user = null;
+
         const email = credentials?.email as string;
 
         if (!email) {
           throw new Error("Email is required");
         }
 
-        const user = await prisma.user.findUnique({
+        user = await prisma.user.findUnique({
           where: { email },
         });
 
         if (!user) {
           throw new Error("Usuário não encontrado");
-        }
-
-        const isValid = compareSync(
-          credentials.password as string,
-          user.password as string
-        );
-
-        if (!isValid) {
-          throw new Error("Senha incorreta");
         }
 
         return user;

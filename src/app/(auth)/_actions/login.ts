@@ -6,8 +6,7 @@ import { compareSync } from "bcrypt-ts";
 import { revalidatePath } from "next/cache";
 
 export const login = async (formData: FormData) => {
-  await signIn("credentials", { formData });
-  revalidatePath("/");
+  console.log(formData);
 };
 
 export const VerifySession = async () => {
