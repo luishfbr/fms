@@ -14,16 +14,30 @@ import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/zod";
 import { z } from "zod";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { LoginWithCredentials, VerifySession } from "../_actions/login";
+import { useForm, SubmitHandler } from "react-hook-form";
+import {
+  getQRCode,
+  getUserByEmail,
+  verifyCredentials,
+  verifyTotp,
+} from "../_actions/login";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useToast } from "@/app/utils/ToastContext";
+import { QrCodeForm } from "./qrcode-form";
+import { NoQrCodeForm } from "./no-qrcode-form";
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+interface User {
+  id: string;
+}
+
 export function LoginForm() {
   const { showToast } = useToast();
+  const [infoUser, setInfoUser] = useState<User | null>(null); // Definir o estado inicial como null
+  const [qrCode, setQrCode] = useState<string | null>(null);
+  const [isTotpEnable, setIsTotpEnable] = useState(false); // Controle de TOTP habilitado
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -43,21 +57,28 @@ export function LoginForm() {
       formData.append("email", data.email);
       formData.append("password", data.password);
 
-      const response = await LoginWithCredentials(formData);
+      // Verificar as credenciais do usuário
+      await verifyCredentials(formData);
 
-      if (response.status === 200) {
-        showToast("Login efetuado com sucesso!");
-        router.push(`/qrcode?id=${response.id}`);
-      } else if (response.status === 404) {
-        showToast("Usuário não encontrado");
-      } else if (response.status === 401) {
-        showToast("Senha incorreta");
+      // Verificar se o TOTP está habilitado
+      const totpEnabled = await verifyTotp(formData);
+
+      if (!totpEnabled) {
+        // Se o TOTP não estiver habilitado, gerar o QR code
+        const qrCode = await getQRCode(formData);
+        const userData = await getUserByEmail(data.email);
+        setInfoUser(userData);
+        setQrCode(qrCode);
       } else {
-        showToast("Erro inesperado. Tente novamente.");
+        // Se o TOTP estiver habilitado
+        setIsTotpEnable(true);
       }
+
+      showToast(
+        "Autenticação bem-sucedida. Verifique o código de autenticação!"
+      );
     } catch (error) {
-      console.log(error);
-      showToast("Falha ao processar o login. Verifique sua conexão.");
+      showToast("Usuário ou senha incorretos.");
     } finally {
       setIsSubmitting(false);
     }
@@ -66,43 +87,55 @@ export function LoginForm() {
   return (
     <TabsContent value="login">
       <Card>
-        <div>
-          <CardHeader>
-            <CardTitle>Seja bem-vinda(o)!</CardTitle>
-            <CardDescription>
-              Insira as informações e acesse o gerenciador de arquivos.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="space-y-1">
-                <Label htmlFor="email">Email</Label>
-                <Input {...register("email")} id="email" type="email" />
-                {errors.email && (
-                  <p className="text-red-700 text-sm">{errors.email.message}</p>
-                )}
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="password">Senha</Label>
-                <Input
-                  {...register("password")}
-                  id="password"
-                  type="password"
-                />
-                {errors.password && (
-                  <p className="text-red-700 text-sm">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
-              <div className="flex text-center items-center justify-center mt-6">
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Entrando..." : "Entrar"}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </div>
+        {!infoUser && !isTotpEnable && (
+          <div>
+            <CardHeader>
+              <CardTitle>Seja bem-vinda(o)!</CardTitle>
+              <CardDescription>
+                Insira as informações e acesse o gerenciador de arquivos.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="space-y-1">
+                  <Label htmlFor="email">Email</Label>
+                  <Input {...register("email")} id="email" type="email" />
+                  {errors.email && (
+                    <p className="text-red-700 text-sm">
+                      {errors.email.message}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="password">Senha</Label>
+                  <Input
+                    {...register("password")}
+                    id="password"
+                    type="password"
+                  />
+                  {errors.password && (
+                    <p className="text-red-700 text-sm">
+                      {errors.password.message}
+                    </p>
+                  )}
+                </div>
+                <div className="flex text-center items-center justify-center mt-6">
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? "Entrando..." : "Entrar"}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </div>
+        )}
+
+        {/* Se o TOTP não estiver habilitado, mostrar o formulário de QR Code */}
+        {infoUser && qrCode && !isTotpEnable && (
+          <QrCodeForm qrcode={qrCode} id={infoUser?.id} />
+        )}
+
+        {/* Se o TOTP estiver habilitado, mostrar o formulário sem QR Code */}
+        {isTotpEnable && <NoQrCodeForm id={infoUser?.id} />}
       </Card>
     </TabsContent>
   );

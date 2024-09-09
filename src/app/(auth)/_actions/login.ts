@@ -3,56 +3,11 @@
 import { prisma } from "@/app/utils/prisma";
 import { auth, signIn, signOut } from "@/services/auth";
 import { compareSync } from "bcrypt-ts";
+import { authenticator } from "otplib";
+import qrcode from "qrcode";
 
-export const ExistingUser = async (formData: FormData) => {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-
-  const user = await prisma.user.findUnique({
-    where: { email },
-    select: {
-      password: true,
-      id: true,
-      name: true,
-      email: true,
-    },
-  });
-
-  if (!user || !user.password) {
-    return {
-      status: 404,
-      message: "Usuário não encontrado ou senha não disponível",
-    };
-  }
-
-  const isPasswordCorrect = compareSync(password, user.password);
-
-  if (!isPasswordCorrect) {
-    return {
-      status: 401,
-      message: "Senha incorreta",
-    };
-  }
-
-  return {
-    status: 200,
-    id: user.id,
-    message: "Login bem-sucedido",
-  };
-};
-
-export const LoginWithCredentials = async (formData: FormData) => {
-  const response = await ExistingUser(formData);
-
-  if (response.status === 404 || response.status === 401) {
-    return { status: response.status, message: response.message };
-  }
-
-  if (response.status === 200) {
-    return { status: 200, message: "Login bem-sucedido", id: response.id };
-  }
-
-  return { status: 500, message: "Erro interno no servidor" };
+export const Login = async (formData: FormData) => {
+  await signIn("credentials", formData);
 };
 
 export const VerifySession = async () => {
@@ -62,4 +17,120 @@ export const VerifySession = async () => {
 
 export const logout = async () => {
   await signOut();
+};
+
+export const verifyCredentials = async (formData: FormData) => {
+  const response = await prisma.user.findUnique({
+    where: { email: formData.get("email") as string },
+    select: {
+      password: true,
+      id: true,
+      email: true,
+    },
+  });
+
+  if (!response) {
+    throw new Error("Usuário não encontrado");
+  }
+
+  const isPasswordCorrect = compareSync(
+    formData.get("password") as string,
+    response.password as string
+  );
+
+  if (!isPasswordCorrect) throw new Error("Senha incorreta");
+
+  return response;
+};
+
+export const getQRCode = async (formData: FormData) => {
+  const user = await prisma.user.findUnique({
+    where: { email: formData.get("email") as string },
+    select: {
+      otpSecret: true,
+      email: true,
+    },
+  });
+
+  const email = user?.email?.split("@")[0];
+  const otpSecret = user?.otpSecret;
+  const issuer = "FMS";
+
+  const otpUrl = `otpauth://totp/${issuer}:${email}?secret=${otpSecret}&issuer=${issuer}&algorithm=SHA1&digits=6&period=30`;
+
+  return await qrcode.toDataURL(otpUrl);
+};
+
+export const verifyTotp = async (formData: FormData) => {
+  const response = await prisma.user.findUnique({
+    where: { email: formData.get("email") as string },
+    select: {
+      totpIsEnable: true,
+      id: true,
+    },
+  });
+
+  if (response?.totpIsEnable === true) {
+    return true;
+  }
+  return false;
+};
+
+export const updateTOTP = async (id: string) => {
+  await prisma.user.update({ where: { id }, data: { totpIsEnable: true } });
+  await prisma.user.findUnique({
+    where: { id },
+    select: {
+      email: true,
+    },
+  });
+};
+
+export const getUserByEmail = async (email: string) => {
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!user) {
+    throw new Error("Usuário não encontrado");
+  }
+
+  return user;
+};
+
+export const verifyOtpCode = async (code: string, id: string) => {
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      otpSecret: true,
+    },
+  });
+
+  const otpSecret = user?.otpSecret as string;
+
+  const isValid = authenticator.check(code, otpSecret);
+
+  if (isValid) {
+    return true;
+  }
+  return false;
+};
+
+export const LoginWithId = async (id: string) => {
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      email: true,
+      password: true,
+    },
+  });
+
+  const formData = new FormData();
+  formData.append("email", user?.email as string);
+  formData.append("password", user?.password as string);
+
+  await signIn("credentials", formData);
 };

@@ -65,3 +65,7 @@ export const createModelSchema = z.object({
   description: z.string().min(1, "Descrição obrigatória"),
   fileTemplateId: z.string().min(1, "Id do modelo obrigatório"),
 });
+
+export const qrcodeSchema = z.object({
+  code: z.string().min(6, "Código inválido").max(6, "Código inválido"),
+});
