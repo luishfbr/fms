@@ -1,18 +1,13 @@
-import { Button } from "@/components/ui/button";
+"use client";
+
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import {
-  getModelsBySectorId,
-  getSectorByUserId,
-  getSectors,
-  User,
-} from "../_actions/dashboard";
+import { getModelsBySectorId, getSectors } from "../_actions/dashboard";
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -26,7 +21,7 @@ interface Sector {
 
 interface Model {
   id: string;
-  modelName: string;
+  modelName: string | null;
 }
 
 export const ContainerTables = () => {
@@ -37,14 +32,14 @@ export const ContainerTables = () => {
 
   const fetchSectors = async () => {
     const response = await getSectors();
-    setSectors(response);
+    setSectors(response ?? []);
   };
 
   const handleChangeSector = async (sectorId: string) => {
     const sector = sectors.find((sector) => sector.id === sectorId) || null;
     setSelectedSector(sector);
     const models = await getModelsBySectorId(sectorId);
-    setModels(models);
+    setModels(models.filter((model) => model.modelName !== null));
   };
 
   const handleChangeModel = (modelId: string) => {
