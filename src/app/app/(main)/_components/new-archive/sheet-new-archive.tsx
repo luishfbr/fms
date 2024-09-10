@@ -25,7 +25,7 @@ interface Sector {
 
 interface Model {
   id: string;
-  modelName: string;
+  modelName: string | null;
 }
 
 export function SheetNewArchive({ id }: { id: string }) {
@@ -58,7 +58,7 @@ export function SheetNewArchive({ id }: { id: string }) {
       setSelectedSector(selected);
       if (selected) {
         const response = await getModelsBySectorId(selected.id);
-        setModels(response);
+        setModels(response.filter((model) => model.modelName !== null));
       }
     } catch (err) {
       setError("Error fetching models. Please try again.");
