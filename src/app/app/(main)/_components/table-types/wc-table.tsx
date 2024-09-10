@@ -68,7 +68,19 @@ export const TableWorkContract = () => {
   const getFieldsWorkContract = async () => {
     const response = await getTableWorkContract(id);
     if (response) {
-      SetFields(response);
+      const updatedResponse = response.map((item) => ({
+        ...item,
+        fileTemplateId: id,
+        shelf: item.shelf || "",
+        box: item.box || "",
+        folder: item.folder || "",
+        name: item.name || "",
+        cpf: item.cpf || "",
+        registration: item.registration || "",
+        addData: item.addData || "",
+        logoutDate: item.logoutDate || "",
+      }));
+      SetFields(updatedResponse);
     } else {
       showToast("Erro ao buscar os dados");
     }

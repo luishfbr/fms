@@ -178,8 +178,6 @@ export const getTablePoint = async (id: string) => {
       name: true,
       cpf: true,
       registration: true,
-      addData: true,
-      logoutDate: true,
       month: true,
       year: true,
     },

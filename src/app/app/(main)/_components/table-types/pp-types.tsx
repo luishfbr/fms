@@ -17,7 +17,6 @@ import {
 import React, { useEffect } from "react";
 import { useToast } from "@/app/utils/ToastContext";
 import { PointArchiveProps } from "@/app/types/types";
-import { register } from "module";
 import { useForm } from "react-hook-form";
 import {
   Popover,
@@ -79,7 +78,19 @@ export const TablePointArchive = () => {
   const getFieldsPoint = async () => {
     const response = await getTablePoint(id);
     if (response) {
-      SetFields(response);
+      const updatedResponse = response.map((item) => ({
+        ...item,
+        fileTemplateId: id,
+        shelf: item.shelf || "",
+        box: item.box || "",
+        folder: item.folder || "",
+        name: item.name || "",
+        cpf: item.cpf || "",
+        registration: item.registration || "",
+        month: item.month || "",
+        year: item.year || "",
+      }));
+      SetFields(updatedResponse);
     } else {
       showToast("Erro ao buscar os dados");
     }

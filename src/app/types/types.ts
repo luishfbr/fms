@@ -7,8 +7,8 @@ export interface WorkContractProps {
   cpf: string;
   registration: string;
   addData: string;
-  logoutDate: string | null;
-  fileTemplateId: string;
+  logoutDate: string;
+  fileTemplateId?: string;
 }
 
 export interface PointArchiveProps {
@@ -21,7 +21,7 @@ export interface PointArchiveProps {
   registration: string;
   month: string;
   year: string;
-  fileTemplateId: string;
+  fileTemplateId?: string;
 }
 
 export interface InputBaseProps {
