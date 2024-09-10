@@ -38,7 +38,7 @@ export function LoginForm() {
   const [infoUser, setInfoUser] = useState<User | null>(null); // Definir o estado inicial como null
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [isTotpEnable, setIsTotpEnable] = useState(false); // Controle de TOTP habilitado
-  const router = useRouter();
+  const [email, setEmail] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -53,6 +53,8 @@ export function LoginForm() {
   const onSubmit: SubmitHandler<LoginFormData> = async (data) => {
     setIsSubmitting(true);
     try {
+      setEmail(data.email);
+
       const formData = new FormData();
       formData.append("email", data.email);
       formData.append("password", data.password);
@@ -135,7 +137,7 @@ export function LoginForm() {
         )}
 
         {/* Se o TOTP estiver habilitado, mostrar o formulário sem QR Code */}
-        {isTotpEnable && <NoQrCodeForm id={infoUser?.id} />}
+        {isTotpEnable && email && <NoQrCodeForm email={email} />}
       </Card>
     </TabsContent>
   );

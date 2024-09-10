@@ -110,8 +110,28 @@ export const verifyOtpCode = async (code: string, id: string) => {
   });
 
   const otpSecret = user?.otpSecret as string;
+  const token = code;
 
-  const isValid = authenticator.check(code, otpSecret);
+  const isValid = authenticator.verify({ token, secret: otpSecret });
+
+  if (isValid) {
+    return true;
+  }
+  return false;
+};
+
+export const verifyOtpCodeByEmail = async (code: string, email: string) => {
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      otpSecret: true,
+    },
+  });
+
+  const otpSecret = user?.otpSecret as string;
+  const token = code;
+
+  const isValid = authenticator.verify({ token, secret: otpSecret });
 
   if (isValid) {
     return true;
@@ -130,7 +150,14 @@ export const LoginWithId = async (id: string) => {
 
   const formData = new FormData();
   formData.append("email", user?.email as string);
-  formData.append("password", user?.password as string);
 
   await signIn("credentials", formData);
+  return true;
+};
+
+export const loginWithEmail = async (email: string) => {
+  const formData = new FormData();
+  formData.append("email", email as string);
+  await signIn("credentials", formData);
+  return true;
 };

@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TableWorkContract } from "./table-types/wc-table";
+import { TablePointArchive } from "./table-types/pp-types";
 
 interface Sector {
   id: string;
@@ -96,6 +97,7 @@ export const ContainerTables = () => {
         {selectedModel?.modelName === "Contrato de Trabalho" && (
           <TableWorkContract />
         )}
+        {selectedModel?.modelName === "Folha de Ponto" && <TablePointArchive />}
       </div>
     </div>
   );

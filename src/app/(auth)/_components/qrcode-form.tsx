@@ -37,15 +37,17 @@ export const QrCodeForm: React.FC<{ qrcode: string; id: string }> = ({
   const onSubmit = async (data: QrCodeFormData) => {
     setIsSubmitting(true);
     try {
-      const response = await verifyOtpCode(data.code, id);
-      if (response === true) {
+      const verify = await verifyOtpCode(data.code, id);
+      if (verify === true) {
         showToast("Código de autenticação verificado com sucesso!");
         await updateTOTP(id);
         await LoginWithId(id);
         router.push("/app");
+      } else {
+        showToast("Código de autenticação inválido.");
       }
     } catch (error) {
-      console.error(error);
+      showToast("Servidor não está respondendo.");
     } finally {
       setIsSubmitting(false);
     }
@@ -71,6 +73,7 @@ export const QrCodeForm: React.FC<{ qrcode: string; id: string }> = ({
             className="text-center"
             id="code"
             placeholder="Código de verificação"
+            autoComplete="off"
           />
           {errors.code && (
             <p className="text-red-700 text-sm">{errors.code.message}</p>

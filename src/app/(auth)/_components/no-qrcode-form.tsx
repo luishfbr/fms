@@ -12,13 +12,18 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Image from "next/image";
 import example from "@/app/utils/assets/example.jpeg";
-import { LoginWithId, verifyOtpCode } from "../_actions/login";
+import {
+  loginWithEmail,
+  LoginWithId,
+  verifyOtpCode,
+  verifyOtpCodeByEmail,
+} from "../_actions/login";
 import { useToast } from "@/app/utils/ToastContext";
 import { useRouter } from "next/navigation";
 
 type QrCodeFormData = z.infer<typeof qrcodeSchema>;
 
-export const NoQrCodeForm: React.FC<{ id: string }> = ({ id }) => {
+export const NoQrCodeForm: React.FC<{ email: string }> = ({ email }) => {
   const { showToast } = useToast();
   const router = useRouter();
   const {
@@ -30,11 +35,13 @@ export const NoQrCodeForm: React.FC<{ id: string }> = ({ id }) => {
   });
 
   const onSubmit = async (data: QrCodeFormData) => {
-    const response = await verifyOtpCode(data.code, id);
+    const response = await verifyOtpCodeByEmail(data.code, email);
     if (response === true) {
       showToast("Código de autenticação verificado com sucesso!");
-      await LoginWithId(id);
+      await loginWithEmail(email);
       router.push("/app");
+    } else {
+      showToast("Código de autenticação inválido.");
     }
   };
 
@@ -58,6 +65,7 @@ export const NoQrCodeForm: React.FC<{ id: string }> = ({ id }) => {
             className="text-center"
             id="code"
             placeholder="Código de verificação"
+            autoComplete="off"
           />
           {errors.code && (
             <p className="text-red-700 text-sm">{errors.code.message}</p>

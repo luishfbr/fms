@@ -260,7 +260,34 @@ export const deleteWorkContract = async (id: string) => {
   return false;
 };
 
+export const deletePoint = async (id: string) => {
+  const response = await prisma.fields.delete({
+    where: {
+      id: id,
+    },
+  });
+  if (response) {
+    return true;
+  }
+  return false;
+};
+
 export const updateWorkContract = async (data: WorkContractProps) => {
+  const response = await prisma.fields.update({
+    where: {
+      id: data.id,
+    },
+    data: {
+      ...data,
+    },
+  });
+  if (response) {
+    return true;
+  }
+  return false;
+};
+
+export const updatePoint = async (data: PointArchiveProps) => {
   const response = await prisma.fields.update({
     where: {
       id: data.id,
