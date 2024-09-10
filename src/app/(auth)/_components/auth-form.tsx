@@ -25,9 +25,7 @@ export const AuthForm = () => {
         <Tabs defaultValue="login" className="w-[500px] ">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Entrar</TabsTrigger>
-            <TabsTrigger disabled value="register">
-              Registrar
-            </TabsTrigger>
+            <TabsTrigger value="register">Registrar</TabsTrigger>
           </TabsList>
           <LoginForm />
           <RegisterForm />
