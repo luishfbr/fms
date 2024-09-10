@@ -81,11 +81,6 @@ export const ContainerTables = () => {
             </SelectContent>
           </Select>
         )}
-
-        <Input
-          className="w-80 text-center"
-          placeholder="Pesquise pelo arquivo desejado"
-        />
       </div>
 
       <div>
