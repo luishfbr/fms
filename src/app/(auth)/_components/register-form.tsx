@@ -20,15 +20,17 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useState } from "react";
 import RegisterUser from "../_actions/register";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/app/utils/ToastContext";
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 export const RegisterForm = () => {
-  const router = useRouter();
+  const { showToast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isValid },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -40,7 +42,10 @@ export const RegisterForm = () => {
     try {
       const response = await RegisterUser(data);
       if (response === true) {
-        router.refresh();
+        showToast("Usuário criado com sucesso!");
+        reset();
+      } else {
+        showToast("Falha ao criar usuário, email já cadastrado!");
       }
     } finally {
       setIsSubmitting(false);

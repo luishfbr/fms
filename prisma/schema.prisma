@@ -1,88 +1,87 @@
-datasource db {
-    provider  = "postgresql"
-    url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-    directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["driverAdapters"]
 }
 
-generator client {
-    provider = "prisma-client-js"
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String   @id @default(cuid())
     name          String?
-    email         String?   @unique
-    emailVerified DateTime?
+    email         String   @unique
     password      String?
     otpSecret     String?
-    totpIsEnable  Boolean?  @default(false)
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    sectors       Sector[]  @relation("UserSectors")
-    role          String?   @default("user")
-    createdAt     DateTime  @default(now())
-    updatedAt     DateTime  @updatedAt
+    totpIsEnabled Boolean  @default(false)
+    role          Role     @default(USER)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    accounts Account[]
+    sessions Session[]
+    sectors  Sector[]
+}
+
+enum Role {
+    USER
+    ADMIN
+    CREATOR
 }
 
 model Sector {
-    id           String         @id @default(cuid())
-    name         String         @unique
-    users        User[]         @relation("UserSectors")
-    FileTemplate FileTemplate[]
+    id   String @id @default(cuid())
+    name String @unique
 
-    @@map("sectors")
+    users     User[]
+    templates FileTemplate[]
 }
 
 model FileTemplate {
-    id        String   @id @default(cuid())
-    url       String?
-    modelName String?
-    sectorId  String   @map("sector_id")
-    sector    Sector   @relation(fields: [sectorId], references: [id], onDelete: Cascade)
-    Fields    Fields[]
+    id        String @id @default(cuid())
+    modelName String
+    sector    Sector @relation(onDelete: Cascade, fields: [sectorId], references: [id])
 
-    @@map("fileTemplates")
+    fields   Field[]
+    files    File[]
+    sectorId String
 }
 
-model Fields {
+model Field {
     id             String       @id @default(cuid())
-    shelf          String?
-    box            String?
-    folder         String?
-    name           String?
-    cpf            String?
-    cnpj           String?
-    registration   String?
-    addData        String?
-    logoutDate     String?
-    month          String?
-    year           String?
-    description    String?
-    fileTemplate   FileTemplate @relation(fields: [fileTemplateId], references: [id], onDelete: Cascade)
-    fileTemplateId String       @map("fileTemplate_id")
+    fieldType      FieldType
+    fieldLabel     String
+    fileTemplate   FileTemplate @relation(onDelete: Cascade, fields: [fileTemplateId], references: [id])
+    fileTemplateId String
+}
 
-    @@map("fields")
+enum FieldType {
+    TEXT
+    CPF
+    CNPJ
+    DATE
+    SELECTION
+    PHONE
+}
+
+model File {
+    id             String       @id @default(cuid())
+    data           Json
+    fileTemplate   FileTemplate @relation(onDelete: Cascade, fields: [fileTemplateId], references: [id])
+    createdAt      DateTime     @default(now())
+    updatedAt      DateTime     @updatedAt
+    fileTemplateId String
 }
 
 model Account {
-    id                String   @id @default(cuid())
+    id                String @id @default(cuid())
     userId            String
     type              String
     provider          String
     providerAccountId String
-    refresh_token     String?
-    access_token      String?
-    expires_at        Int?
-    token_type        String?
-    scope             String?
-    id_token          String?
-    session_state     String?
-    createdAt         DateTime @default(now())
-    updatedAt         DateTime @updatedAt
-    user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([provider, providerAccountId])
+    user User @relation(onDelete: Cascade, fields: [userId], references: [id])
 }
 
 model Session {
@@ -90,9 +89,8 @@ model Session {
     sessionToken String   @unique
     userId       String
     expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    createdAt    DateTime @default(now())
-    updatedAt    DateTime @updatedAt
+
+    user User @relation(onDelete: Cascade, fields: [userId], references: [id])
 }
 
 model VerificationToken {

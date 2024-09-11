@@ -25,12 +25,10 @@ export default async function RegisterUser(data: data) {
 
     const createUser = await prisma.user.create({
       data: {
-        name: name,
-        email: email,
+        name,
+        email,
         password: hashedPassword,
-        otpSecret: otpSecret,
-        totpIsEnable: false,
-        role: role,
+        otpSecret,
       },
     });
 

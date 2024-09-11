@@ -65,19 +65,19 @@ export const verifyTotp = async (formData: FormData) => {
   const response = await prisma.user.findUnique({
     where: { email: formData.get("email") as string },
     select: {
-      totpIsEnable: true,
+      totpIsEnabled: true,
       id: true,
     },
   });
 
-  if (response?.totpIsEnable === true) {
+  if (response?.totpIsEnabled === true) {
     return true;
   }
   return false;
 };
 
 export const updateTOTP = async (id: string) => {
-  await prisma.user.update({ where: { id }, data: { totpIsEnable: true } });
+  await prisma.user.update({ where: { id }, data: { totpIsEnabled: true } });
   await prisma.user.findUnique({
     where: { id },
     select: {

@@ -44,16 +44,16 @@ export const ChangeRole: React.FC<ChangeRoleProps> = ({
 
   // Set roleSelected and update the form value
   const selectAdmin = () => {
-    setRoleSelected("admin");
-    setValue("role", "admin");
+    setRoleSelected("ADMIN");
+    setValue("role", "ADMIN");
   };
   const selectUser = () => {
-    setRoleSelected("user");
-    setValue("role", "user");
+    setRoleSelected("USER");
+    setValue("role", "USER");
   };
   const selectCreator = () => {
-    setRoleSelected("creator");
-    setValue("role", "creator");
+    setRoleSelected("CREATOR");
+    setValue("role", "CREATOR");
   };
 
   const onSubmit = async (data: UserFormData) => {

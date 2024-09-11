@@ -60,7 +60,7 @@ export const CreateNewSector: React.FC<CreateButtonProps> = ({
       if (createSectorResponse === true) {
         onCreateSuccess();
         reset();
-        showToast("Setor criado com sucesso!Atualize a página...");
+        showToast("Setor criado com sucesso!");
       }
       setIsSubmitting(false);
     } catch (error) {

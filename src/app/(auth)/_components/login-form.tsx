@@ -21,7 +21,6 @@ import {
   verifyCredentials,
   verifyTotp,
 } from "../_actions/login";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useToast } from "@/app/utils/ToastContext";
 import { QrCodeForm } from "./qrcode-form";
@@ -35,9 +34,9 @@ interface User {
 
 export function LoginForm() {
   const { showToast } = useToast();
-  const [infoUser, setInfoUser] = useState<User | null>(null); // Definir o estado inicial como null
+  const [infoUser, setInfoUser] = useState<User | null>(null);
   const [qrCode, setQrCode] = useState<string | null>(null);
-  const [isTotpEnable, setIsTotpEnable] = useState(false); // Controle de TOTP habilitado
+  const [isTotpEnable, setIsTotpEnable] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 

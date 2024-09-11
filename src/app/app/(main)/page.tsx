@@ -12,6 +12,7 @@ import { ContainerTables } from "./_components/container-tables";
 import { SheetNewArchive } from "./_components/new-archive/sheet-new-archive";
 import { User } from "./_actions/dashboard";
 import { useEffect, useState } from "react";
+import { SheetNewModel } from "./_components/new-model/sheet-new-model";
 
 interface User {
   id: string;
@@ -32,8 +33,9 @@ export default function Page() {
       <DashboardPage>
         <DashboardPageHeader>
           <DashboardPageHeaderTitle>Arquivos</DashboardPageHeaderTitle>
-          {user?.role === "creator" || user?.role === "admin" ? (
-            <DashboardPageHeaderNav>
+          {user?.role === "CREATOR" || user?.role === "ADMIN" ? (
+            <DashboardPageHeaderNav className="flex gap-4">
+              <SheetNewModel id={user.id} />
               <SheetNewArchive id={user.id} />
             </DashboardPageHeaderNav>
           ) : null}

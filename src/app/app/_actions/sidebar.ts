@@ -16,7 +16,7 @@ export const adminButton = async () => {
       },
     });
 
-    if (response?.role === "admin") {
+    if (response?.role === "ADMIN") {
       return true;
     }
 
@@ -36,7 +36,7 @@ export const creatorButton = async () => {
         role: true,
       },
     });
-    if (response?.role === "creator") {
+    if (response?.role === "CREATOR") {
       return true;
     }
     return false;
