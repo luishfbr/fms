@@ -20,7 +20,7 @@ export const checkButton = async () => {
 
     console.log(response);
 
-    if (response?.role === "creator" || response?.role === "admin") {
+    if (response?.role === "CREATOR" || response?.role === "ADMIN") {
       return { id: response.id, havePermission: true };
     }
   }
@@ -81,7 +81,6 @@ export const getModelsBySectorId = async (sectorId: string) => {
     select: {
       id: true,
       modelName: true,
-      url: true,
     },
   });
 
