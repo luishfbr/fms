@@ -57,12 +57,15 @@ model Field {
 }
 
 enum FieldType {
-    TEXT
-    CPF
-    CNPJ
-    DATE
-    SELECTION
-    PHONE
+    NAME    @map("nome-completo")
+    CPF     @map("cpf")
+    CNPJ    @map("cnpj")
+    ADDDATE @map("data-de-admissao")
+    LOGDATE @map("data-de-rescisao")
+    DATE    @map("data")
+    DAY     @map("dia")
+    MONTH   @map("mes")
+    YEAR    @map("ano")
 }
 
 model File {

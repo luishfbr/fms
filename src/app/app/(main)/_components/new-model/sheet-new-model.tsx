@@ -7,33 +7,39 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useEffect, useState } from "react";
 import { getSectorByUserId } from "../../_actions/dashboard";
-import { MoveDown } from "lucide-react";
+import { MoveDown, Trash } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { SectorSelect } from "./_components/sector-select";
 
-interface Sectors {
+const fieldTypes = [
+  "Nome Completo",
+  "CPF",
+  "CNPJ",
+  "Data de Admissão",
+  "Data de Rescisão",
+  "Data",
+  "Dia",
+  "Mês",
+  "Ano",
+];
+
+export interface Sectors {
   id: string;
   name: string;
 }
 
-interface Field {
+export interface Field {
   id: string;
   value: string;
   type: string;
 }
 
-interface FormData {
+export interface FormData {
   modelName: string;
   fields: Field[];
 }
@@ -51,8 +57,16 @@ export function SheetNewModel({ id }: { id: string }) {
   const [sectors, setSectors] = useState<Sectors[]>([]);
   const [selectedSector, setSelectedSector] = useState<string | null>(null);
   const [fields, setFields] = useState<Field[]>([]);
+  const [disabledFields, setDisabledFields] = useState<{
+    [key: string]: boolean;
+  }>({}); // State to track disabled buttons
 
-  const { register, handleSubmit, watch } = useForm<FormData>();
+  const { register, handleSubmit } = useForm<FormData>();
+
+  const getValuesAndSetFields = (value: string) => {
+    const id = getIdFromInputType(value);
+    addField(value, id);
+  };
 
   const onSubmit = (data: FormData) => {
     console.log({
@@ -68,25 +82,26 @@ export function SheetNewModel({ id }: { id: string }) {
     }
   };
 
+  const addField = (fieldValue: string, fieldType: string) => {
+    const newField: Field = {
+      id: getIdFromInputType(fieldValue),
+      value: fieldValue,
+      type: fieldType,
+    };
+    setFields((prevFields) => [...prevFields, newField]);
+    setDisabledFields((prev) => ({ ...prev, [fieldType]: true })); // Disable button for this field type
+  };
+
+  const removeField = (fieldId: string, fieldType: string) => {
+    setFields((prevFields) =>
+      prevFields.filter((field) => field.id !== fieldId)
+    );
+    setDisabledFields((prev) => ({ ...prev, [fieldType]: false })); // Re-enable button for this field type
+  };
+
   useEffect(() => {
     getSectorsById(id);
   }, [id]);
-
-  const addField = (type: string) => {
-    const newField: Field = {
-      id: getIdFromInputType("Novo Campo"),
-      value: "Novo Campo",
-      type,
-    };
-    setFields((prevFields) => [...prevFields, newField]);
-  };
-
-  const updateFieldValue = (index: number, value: string) => {
-    const updatedFields = [...fields];
-    updatedFields[index].value = value;
-    updatedFields[index].id = getIdFromInputType(value);
-    setFields(updatedFields);
-  };
 
   return (
     <Sheet>
@@ -100,18 +115,11 @@ export function SheetNewModel({ id }: { id: string }) {
         </SheetHeader>
 
         <div className="flex flex-col gap-4 items-center justify-center text-center m-4">
-          <Select onValueChange={(value) => setSelectedSector(value)}>
-            <SelectTrigger className="w-auto">
-              <SelectValue placeholder="Selecione um Setor" />
-            </SelectTrigger>
-            <SelectContent>
-              {sectors.map((sector) => (
-                <SelectItem key={sector.id} value={sector.id}>
-                  {sector.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SectorSelect
+            sectors={sectors}
+            selectedSector={selectedSector}
+            setSelectedSector={setSelectedSector}
+          />
 
           {selectedSector && (
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -123,43 +131,39 @@ export function SheetNewModel({ id }: { id: string }) {
                     {...register("modelName")}
                     className="text-center"
                     type="text"
+                    required
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button type="button" onClick={() => addField("text")}>
-                    Campo de Texto
-                  </Button>
-                  <Button type="button" onClick={() => addField("masked")}>
-                    Texto com Máscara
-                  </Button>
-                  <Button type="button" onClick={() => addField("description")}>
-                    Descrição
-                  </Button>
-                  <Button type="button" onClick={() => addField("select")}>
-                    Menu de Seleção
-                  </Button>
+                <div className="grid grid-cols-3 gap-2">
+                  {fieldTypes.map((fieldType) => (
+                    <Button
+                      key={fieldType}
+                      type="button"
+                      onClick={() => getValuesAndSetFields(fieldType)}
+                      disabled={disabledFields[getIdFromInputType(fieldType)]} // Disable based on the field type
+                    >
+                      {fieldType}
+                    </Button>
+                  ))}
                 </div>
-                <ScrollArea className="max-h-[560px] h-[600px]">
-                  <div className="flex flex-col gap-2">
-                    {fields.map((field, index) => (
-                      <div key={field.id} className="flex flex-col gap-2">
-                        <Input
-                          type="text"
-                          value={field.value}
-                          onChange={(e) =>
-                            updateFieldValue(index, e.target.value)
-                          }
-                          placeholder={`Valor do campo (${field.type})`}
-                        />
-                        <Input
-                          className="text-center sr-only"
-                          type="text"
-                          value={field.id}
-                          readOnly
-                        />
-                      </div>
-                    ))}
-                  </div>
+
+                <ScrollArea className="w-64 max-h-[500px] h-[500px]">
+                  {fields.length > 0 ? (
+                    <div className="flex flex-col gap-2 m-2">
+                      {fields.map((field) => (
+                        <div
+                          key={field.id}
+                          className="flex items-center justify-between"
+                        >
+                          <span>{field.value}</span>
+                          <Trash
+                            className="w-5 h-5 cursor-pointer"
+                            onClick={() => removeField(field.id, field.type)}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                 </ScrollArea>
                 <Button type="submit">Criar Modelo</Button>
               </div>
