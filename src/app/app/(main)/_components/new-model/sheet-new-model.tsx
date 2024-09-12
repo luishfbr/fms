@@ -27,9 +27,15 @@ interface Sectors {
   name: string;
 }
 
+interface Field {
+  id: string;
+  value: string;
+  type: string;
+}
+
 interface FormData {
   modelName: string;
-  value: string;
+  fields: Field[];
 }
 
 function getIdFromInputType(input: string): string {
@@ -44,11 +50,15 @@ function getIdFromInputType(input: string): string {
 export function SheetNewModel({ id }: { id: string }) {
   const [sectors, setSectors] = useState<Sectors[]>([]);
   const [selectedSector, setSelectedSector] = useState<string | null>(null);
+  const [fields, setFields] = useState<Field[]>([]);
 
   const { register, handleSubmit, watch } = useForm<FormData>();
 
   const onSubmit = (data: FormData) => {
-    console.log(data);
+    console.log({
+      ...data,
+      fields,
+    });
   };
 
   const getSectorsById = async (id: string) => {
@@ -62,8 +72,21 @@ export function SheetNewModel({ id }: { id: string }) {
     getSectorsById(id);
   }, [id]);
 
-  const watchedValue = watch("value", "");
-  const fieldId = getIdFromInputType(watchedValue);
+  const addField = (type: string) => {
+    const newField: Field = {
+      id: getIdFromInputType("Novo Campo"),
+      value: "Novo Campo",
+      type,
+    };
+    setFields((prevFields) => [...prevFields, newField]);
+  };
+
+  const updateFieldValue = (index: number, value: string) => {
+    const updatedFields = [...fields];
+    updatedFields[index].value = value;
+    updatedFields[index].id = getIdFromInputType(value);
+    setFields(updatedFields);
+  };
 
   return (
     <Sheet>
@@ -103,24 +126,39 @@ export function SheetNewModel({ id }: { id: string }) {
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <Button type="button">Campo de Texto</Button>
-                  <Button type="button">Texto com Máscara</Button>
-                  <Button type="button">Descrição</Button>
-                  <Button type="button">Menu de Seleção</Button>
+                  <Button type="button" onClick={() => addField("text")}>
+                    Campo de Texto
+                  </Button>
+                  <Button type="button" onClick={() => addField("masked")}>
+                    Texto com Máscara
+                  </Button>
+                  <Button type="button" onClick={() => addField("description")}>
+                    Descrição
+                  </Button>
+                  <Button type="button" onClick={() => addField("select")}>
+                    Menu de Seleção
+                  </Button>
                 </div>
                 <ScrollArea className="max-h-[560px] h-[600px]">
                   <div className="flex flex-col gap-2">
-                    <Input
-                      {...register("value")}
-                      type="text"
-                      placeholder="Valor do campo de texto?"
-                    />
-                    <Input
-                      className="text-center"
-                      type="text"
-                      value={fieldId}
-                      readOnly
-                    />
+                    {fields.map((field, index) => (
+                      <div key={field.id} className="flex flex-col gap-2">
+                        <Input
+                          type="text"
+                          value={field.value}
+                          onChange={(e) =>
+                            updateFieldValue(index, e.target.value)
+                          }
+                          placeholder={`Valor do campo (${field.type})`}
+                        />
+                        <Input
+                          className="text-center sr-only"
+                          type="text"
+                          value={field.id}
+                          readOnly
+                        />
+                      </div>
+                    ))}
                   </div>
                 </ScrollArea>
                 <Button type="submit">Criar Modelo</Button>
