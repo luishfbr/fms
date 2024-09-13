@@ -1,3 +1,5 @@
+import { Field } from "../app/(main)/_components/new-model/sheet-new-model";
+
 export interface WorkContractProps {
   id: string;
   shelf: string;
@@ -37,3 +39,10 @@ export interface InputBaseProps {
   addData: string | null;
   logoutDate: string | null;
 }
+
+export interface NewModelProps {
+  modelName: string;
+  sectorId: string;
+  fields: Field[];
+}
+

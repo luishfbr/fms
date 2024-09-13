@@ -1,8 +1,10 @@
 "use server";
 
-import { PointArchiveProps, WorkContractProps } from "@/app/types/types";
+import { NewModelProps } from "@/app/types/types";
 import { prisma } from "@/app/utils/prisma";
 import { auth } from "@/services/auth";
+import { Field } from "../_components/new-model/sheet-new-model";
+import { FieldType } from "@prisma/client";
 
 export const checkButton = async () => {
   const session = await auth();
@@ -90,103 +92,6 @@ export const getModelsBySectorId = async (sectorId: string) => {
   return [];
 };
 
-export const saveWorkContract = async (data: WorkContractProps, id: string) => {
-  const response = await prisma.fields.create({
-    data: { ...data, fileTemplateId: id },
-  });
-  if (response) {
-    return true;
-  }
-};
-
-export const savePointArchive = async (data: PointArchiveProps, id: string) => {
-  try {
-    const response = await prisma.fields.create({
-      data: { ...data, fileTemplateId: id },
-    });
-
-    if (response) {
-      console.log("Arquivo salvo com sucesso:", response);
-      return true;
-    } else {
-      console.error("Erro ao salvar o arquivo: Nenhuma resposta.");
-      return false;
-    }
-  } catch (error) {
-    console.error("Erro ao salvar o arquivo:", error);
-    return false;
-  }
-};
-
-export const getWorkContractByIdModel = async (id: string) => {
-  const response = await prisma.fields.findMany({
-    where: {
-      fileTemplateId: id,
-    },
-    select: {
-      id: true,
-      shelf: true,
-      box: true,
-      folder: true,
-      name: true,
-      cpf: true,
-      registration: true,
-      addData: true,
-      logoutDate: true,
-    },
-  });
-  if (response) {
-    return response;
-  }
-  return [];
-};
-
-export const getTableWorkContract = async (id: string) => {
-  const response = await prisma.fields.findMany({
-    where: {
-      fileTemplateId: id,
-    },
-    select: {
-      id: true,
-      shelf: true,
-      box: true,
-      folder: true,
-      name: true,
-      cpf: true,
-      registration: true,
-      addData: true,
-      logoutDate: true,
-    },
-  });
-  if (response) {
-    return response;
-  }
-  return [];
-};
-
-export const getTablePoint = async (id: string) => {
-  const response = await prisma.fields.findMany({
-    where: {
-      fileTemplateId: id,
-    },
-    select: {
-      id: true,
-      shelf: true,
-      box: true,
-      folder: true,
-      name: true,
-      cpf: true,
-      registration: true,
-      month: true,
-      year: true,
-    },
-  });
-  if (response) {
-    return response;
-  }
-  return [];
-};
-
 export const User = async () => {
   const session = await auth();
   if (session?.user) {
@@ -230,71 +135,35 @@ export const getSectorsById = async (id: string) => {
   return [];
 };
 
-export const getValuesModel = async (id: string) => {
-  const response = await prisma.fields.findMany({
-    where: {
-      fileTemplateId: id,
-    },
-    select: {
-      name: true,
-    },
-  });
-  if (response) {
-    return response;
-  }
-  return [];
-};
+export const createNewModel = async (formData: NewModelProps) => {
+  const modelName = formData.modelName as string;
+  const sectorId = formData.sectorId as string;
+  const fields = formData.fields as Field[];
 
-export const deleteWorkContract = async (id: string) => {
-  const response = await prisma.fields.delete({
-    where: {
-      id: id,
-    },
-  });
-  if (response) {
-    return true;
-  }
-  return false;
-};
-
-export const deletePoint = async (id: string) => {
-  const response = await prisma.fields.delete({
-    where: {
-      id: id,
-    },
-  });
-  if (response) {
-    return true;
-  }
-  return false;
-};
-
-export const updateWorkContract = async (data: WorkContractProps) => {
-  const response = await prisma.fields.update({
-    where: {
-      id: data.id,
-    },
+  // Criar o novo modelo
+  const newModelName = await prisma.fileTemplate.create({
     data: {
-      ...data,
+      modelName: modelName,
+      sectorId: sectorId,
     },
   });
-  if (response) {
-    return true;
-  }
-  return false;
-};
 
-export const updatePoint = async (data: PointArchiveProps) => {
-  const response = await prisma.fields.update({
-    where: {
-      id: data.id,
-    },
-    data: {
-      ...data,
-    },
-  });
-  if (response) {
-    return true;
+  if (newModelName) {
+    const fileTemplateId = newModelName.id as string;
+
+    // Criar os campos do modelo, adaptando para o formato correto esperado pelo Prisma
+    const fieldsData = fields.map((field) => ({
+      fieldType: field.type as FieldType, // Certifique-se de que o tipo de campo está correto
+      fieldLabel: field.value,
+      fileTemplateId: fileTemplateId,
+    }));
+
+    await prisma.field.createMany({
+      data: fieldsData,
+    });
+
+    return newModelName; // Retorna o modelo criado para confirmar a criação
   }
-  return false;
+
+  return null; // Retorna null se houver falha
 };
