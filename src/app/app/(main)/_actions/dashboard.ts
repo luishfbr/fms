@@ -167,3 +167,36 @@ export const createNewModel = async (formData: NewModelProps) => {
 
   return null; // Retorna null se houver falha
 };
+
+export const GetModelsById = async (id: string) => {
+  const response = await prisma.fileTemplate.findUnique({
+    where: {
+      id: id,
+    },
+    select: {
+      id: true,
+      modelName: true,
+    },
+  });
+
+  if (response) {
+    return response;
+  }
+  return null;
+};
+
+export const GetHeadersByFileTemplateId = async (id: string) => {
+  const response = await prisma.field.findMany({
+    where: {
+      fileTemplateId: id,
+    },
+    select: {
+      fieldType: true,
+      fieldLabel: true,
+    },
+  });
+
+  if (response) {
+    return response;
+  }
+};

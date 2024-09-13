@@ -1,6 +1,5 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { getModelsBySectorId, getSectors } from "../_actions/dashboard";
 import {
@@ -11,8 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TableWorkContract } from "./table-types/wc-table";
-import { TablePointArchive } from "./table-types/pp-types";
+import { TableContainer } from "./table-container";
 
 interface Sector {
   id: string;
@@ -83,12 +81,7 @@ export const ContainerTables = () => {
         )}
       </div>
 
-      <div>
-        {selectedModel?.modelName === "Contrato de Trabalho" && (
-          <TableWorkContract />
-        )}
-        {selectedModel?.modelName === "Folha de Ponto" && <TablePointArchive />}
-      </div>
+      {selectedModel && <TableContainer modelId={selectedModel.id} />}
     </div>
   );
 };
