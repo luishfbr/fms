@@ -200,3 +200,12 @@ export const GetHeadersByFileTemplateId = async (id: string) => {
     return response;
   }
 };
+
+
+export const fieldsByFiletemplateId = async (fileTemplateId: string) {
+  const response = await prisma.field.findMany({
+    where: {
+      fileTemplateId: fileTemplateId
+    } 
+  })
+}

@@ -167,9 +167,7 @@ export function SheetNewModel({ id }: { id: string }) {
                       onClick={() =>
                         getValuesAndSetFields(fieldType.label, fieldType.type)
                       }
-                      disabled={
-                        disabledFields[getIdFromInputType(fieldType.label)]
-                      }
+                      disabled={disabledFields[fieldType.type]}
                     >
                       {fieldType.label}
                     </Button>
