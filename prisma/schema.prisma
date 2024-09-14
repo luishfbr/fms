@@ -54,6 +54,7 @@ model Field {
     fieldLabel     String
     fileTemplate   FileTemplate @relation(onDelete: Cascade, fields: [fileTemplateId], references: [id])
     fileTemplateId String
+    File           File[]
 }
 
 enum FieldType {
@@ -72,9 +73,11 @@ model File {
     id             String       @id @default(cuid())
     data           Json
     fileTemplate   FileTemplate @relation(onDelete: Cascade, fields: [fileTemplateId], references: [id])
+    field          Field        @relation(onDelete: Cascade, fields: [fieldId], references: [id])
     createdAt      DateTime     @default(now())
     updatedAt      DateTime     @updatedAt
     fileTemplateId String
+    fieldId        String
 }
 
 model Account {

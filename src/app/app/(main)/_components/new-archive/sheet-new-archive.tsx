@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
 import { getModelsBySectorId, getSectorsById } from "../../_actions/dashboard";
-import { SelectedModelCard } from "../model-types/models-card/main";
+import { SelectedModelForm } from "../model-types/models-card/main";
 
 interface Sector {
   id: string;
@@ -153,7 +153,7 @@ export function SheetNewArchive({ id }: { id: string }) {
           )}
         </div>
         {error && <p className="text-red-500">{error}</p>}
-        {selectedModel && <SelectedModelCard selectedModel={selectedModel} />}
+        {selectedModel && <SelectedModelForm modelId={selectedModel.id} />}
       </SheetContent>
     </Sheet>
   );

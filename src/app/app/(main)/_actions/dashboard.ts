@@ -201,11 +201,19 @@ export const GetHeadersByFileTemplateId = async (id: string) => {
   }
 };
 
-
-export const fieldsByFiletemplateId = async (fileTemplateId: string) {
-  const response = await prisma.field.findMany({
+export const fieldsByFiletemplateId = async (fileTemplateId: string) => {
+  return await prisma.field.findMany({
     where: {
-      fileTemplateId: fileTemplateId
-    } 
-  })
-}
+      fileTemplateId: fileTemplateId,
+    },
+  });
+};
+
+export const getModelById = async (id: string) => {
+  const response = await prisma.fileTemplate.findUnique({
+    where: {
+      id: id,
+    },
+  });
+  return response;
+};
