@@ -14,9 +14,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getModelsBySectorId, getSectorsById } from "../../_actions/dashboard";
 import { SelectedModelForm } from "../model-types/models-card/main";
+import { useToast } from "@/app/utils/ToastContext";
 
 interface Sector {
   id: string;
@@ -33,27 +34,34 @@ export function SheetNewArchive({ id }: { id: string }) {
   const [selectedSector, setSelectedSector] = useState<Sector | null>(null);
   const [models, setModels] = useState<Model[]>([]);
   const [selectedModel, setSelectedModel] = useState<Model | null>(null);
-  const [loadingSectors, setLoadingSectors] = useState<boolean>(false);
-  const [loadingModels, setLoadingModels] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isSheetOpen, setIsSheetOpen] = useState(false); // Controla o estado de abertura do Sheet
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const { showToast } = useToast();
 
-  const handleChangeModel = async (modelId: string) => {
+  const fetchSectors = useCallback(async () => {
     try {
-      setLoadingModels(true);
-      const selected = models.find((model) => model.id === modelId) || null;
-      setSelectedModel(selected);
-      console.log(selected);
+      setIsLoading(true);
+      const fetchedSectors = await getSectorsById(id);
+      setSectors(fetchedSectors);
     } catch (err) {
-      setError("Error fetching models. Please try again.");
+      showToast("Erro ao carregar setores. Por favor, tente novamente.");
     } finally {
-      setLoadingModels(false);
+      setIsLoading(false);
     }
-  };
+  }, [id, showToast]);
 
-  const handleChangeSector = async (sectorId: string) => {
+  useEffect(() => {
+    fetchSectors();
+  }, [fetchSectors]);
+
+  const handleChangeModel = useCallback((modelId: string) => {
+    const selected = models.find((model) => model.id === modelId) || null;
+    setSelectedModel(selected);
+  }, [models]);
+
+  const handleChangeSector = useCallback(async (sectorId: string) => {
     try {
-      setLoadingModels(true);
+      setIsLoading(true);
       const selected = sectors.find((sector) => sector.id === sectorId) || null;
       setSelectedSector(selected);
       if (selected) {
@@ -61,44 +69,27 @@ export function SheetNewArchive({ id }: { id: string }) {
         setModels(response.filter((model) => model.modelName !== null));
       }
     } catch (err) {
-      setError("Error fetching models. Please try again.");
+      showToast("Erro ao carregar modelos. Por favor, tente novamente.");
     } finally {
-      setLoadingModels(false);
+      setIsLoading(false);
     }
-  };
+  }, [sectors, showToast]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoadingSectors(true);
-        const fetchedSectors = await getSectorsById(id);
-        setSectors(fetchedSectors);
-      } catch (err) {
-        setError("Error fetching sectors. Please try again.");
-      } finally {
-        setLoadingSectors(false);
-      }
-    };
-    fetchData();
-  }, [id]);
-
-  const resetSelections = () => {
+  const resetSelections = useCallback(() => {
     setSelectedSector(null);
     setSelectedModel(null);
     setModels([]);
-    setError(null);
-  };
+  }, []);
+
+  const handleSheetOpenChange = useCallback((isOpen: boolean) => {
+    setIsSheetOpen(isOpen);
+    if (!isOpen) {
+      resetSelections();
+    }
+  }, [resetSelections]);
 
   return (
-    <Sheet
-      open={isSheetOpen}
-      onOpenChange={(isOpen) => {
-        setIsSheetOpen(isOpen);
-        if (!isOpen) {
-          resetSelections();
-        }
-      }}
-    >
+    <Sheet open={isSheetOpen} onOpenChange={handleSheetOpenChange}>
       <SheetTrigger asChild>
         <Button>Criar Arquivo</Button>
       </SheetTrigger>
@@ -106,20 +97,13 @@ export function SheetNewArchive({ id }: { id: string }) {
         <SheetHeader>
           <SheetTitle>Crie seu novo arquivo</SheetTitle>
           <SheetDescription>
-            Apenas selecione o setor e o modelo que deseja criar.
+            Selecione o setor e o modelo que deseja criar.
           </SheetDescription>
         </SheetHeader>
         <div className="grid grid-cols-2 my-4 gap-6">
-          {/* Sector Selection */}
-          <Select onValueChange={handleChangeSector}>
+          <Select onValueChange={handleChangeSector} disabled={isLoading}>
             <SelectTrigger className="w-full">
-              <SelectValue
-                placeholder={
-                  loadingSectors
-                    ? "Carregando setores..."
-                    : "Selecione um Setor"
-                }
-              />
+              <SelectValue placeholder={isLoading ? "Carregando..." : "Selecione um Setor"} />
             </SelectTrigger>
             <SelectContent>
               {sectors.map((sector) => (
@@ -130,17 +114,10 @@ export function SheetNewArchive({ id }: { id: string }) {
             </SelectContent>
           </Select>
 
-          {/* Model Selection */}
           {selectedSector && (
-            <Select onValueChange={handleChangeModel}>
+            <Select onValueChange={handleChangeModel} disabled={isLoading}>
               <SelectTrigger className="w-full">
-                <SelectValue
-                  placeholder={
-                    loadingModels
-                      ? "Carregando modelos..."
-                      : "Selecione um Modelo"
-                  }
-                />
+                <SelectValue placeholder={isLoading ? "Carregando..." : "Selecione um Modelo"} />
               </SelectTrigger>
               <SelectContent>
                 {models.map((model) => (
@@ -152,7 +129,6 @@ export function SheetNewArchive({ id }: { id: string }) {
             </Select>
           )}
         </div>
-        {error && <p className="text-red-500">{error}</p>}
         {selectedModel && <SelectedModelForm modelId={selectedModel.id} />}
       </SheetContent>
     </Sheet>

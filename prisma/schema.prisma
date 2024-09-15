@@ -77,7 +77,7 @@ model File {
     value          String
     fileTemplateId String
     fieldId        String
-    commonId       String?
+    commonId       String @unique
 
     field Field @relation(onDelete: Cascade, fields: [fieldId], references: [id])
 

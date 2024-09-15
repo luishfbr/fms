@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import {
   Select,
   SelectContent,
@@ -7,22 +8,32 @@ import {
 } from "@/components/ui/select";
 import { Sectors } from "../sheet-new-model";
 
-export function SectorSelect({
-  sectors,
-  selectedSector,
-  setSelectedSector,
-}: {
+interface SectorSelectProps {
   sectors: Sectors[];
   selectedSector: string | null;
   setSelectedSector: (sector: string) => void;
-}) {
+}
+
+export const SectorSelect: React.FC<SectorSelectProps> = ({
+  sectors,
+  selectedSector,
+  setSelectedSector,
+}) => {
+  const sortedSectors = useMemo(() =>
+    [...sectors].sort((a, b) => a.name.localeCompare(b.name)),
+    [sectors]
+  );
+
   return (
-    <Select onValueChange={(value) => setSelectedSector(value)}>
-      <SelectTrigger className="w-auto">
+    <Select
+      onValueChange={setSelectedSector}
+      value={selectedSector || undefined}
+    >
+      <SelectTrigger className="w-full md:w-64">
         <SelectValue placeholder="Selecione um Setor" />
       </SelectTrigger>
       <SelectContent>
-        {sectors.map((sector) => (
+        {sortedSectors.map((sector) => (
           <SelectItem key={sector.id} value={sector.id}>
             {sector.name}
           </SelectItem>
@@ -30,4 +41,4 @@ export function SectorSelect({
       </SelectContent>
     </Select>
   );
-}
+};
