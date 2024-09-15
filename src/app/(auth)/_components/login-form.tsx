@@ -58,20 +58,16 @@ export function LoginForm() {
       formData.append("email", data.email);
       formData.append("password", data.password);
 
-      // Verificar as credenciais do usuário
       await verifyCredentials(formData);
 
-      // Verificar se o TOTP está habilitado
       const totpEnabled = await verifyTotp(formData);
 
       if (!totpEnabled) {
-        // Se o TOTP não estiver habilitado, gerar o QR code
         const qrCode = await getQRCode(formData);
         const userData = await getUserByEmail(data.email);
         setInfoUser(userData);
         setQrCode(qrCode);
       } else {
-        // Se o TOTP estiver habilitado
         setIsTotpEnable(true);
       }
 
@@ -130,12 +126,10 @@ export function LoginForm() {
           </div>
         )}
 
-        {/* Se o TOTP não estiver habilitado, mostrar o formulário de QR Code */}
         {infoUser && qrCode && !isTotpEnable && (
           <QrCodeForm qrcode={qrCode} id={infoUser?.id} />
         )}
 
-        {/* Se o TOTP estiver habilitado, mostrar o formulário sem QR Code */}
         {isTotpEnable && email && <NoQrCodeForm email={email} />}
       </Card>
     </TabsContent>

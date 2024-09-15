@@ -85,9 +85,9 @@ export const ContainerTables = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-center items-center gap-6">
+      <div className="flex flex-col md:flex-row justify-center items-center gap-6">
         <Select onValueChange={handleChangeSector} value={selectedSector?.id || ""}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-full md:w-[200px]">
             <SelectValue placeholder="Selecione o Setor" />
           </SelectTrigger>
           <SelectContent>
@@ -103,7 +103,7 @@ export const ContainerTables = () => {
 
         {selectedSector && (
           <Select onValueChange={handleChangeModel} value={selectedModel?.id || ""}>
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="w-full md:w-[200px]">
               <SelectValue placeholder="Selecione o Modelo" />
             </SelectTrigger>
             <SelectContent>
@@ -122,7 +122,7 @@ export const ContainerTables = () => {
           type="text"
           placeholder="Pesquisar..."
           onChange={handleSearchChange}
-          className="w-64"
+          className="w-full md:w-64"
         />
       </div>
 

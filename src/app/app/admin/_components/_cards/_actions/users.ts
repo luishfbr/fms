@@ -10,7 +10,7 @@ export const getUsers = async () => {
     name: user.name ?? "",
     role: user.role ?? "",
     email: user.email ?? "",
-    totpIsEnable: user.totpIsEnable ?? false,
+    totpIsEnabled: user.totpIsEnabled ?? false,
   }));
 };
 
@@ -25,47 +25,32 @@ export const getSectors = async () => {
 
 export const deleteUser = async (email: string) => {
   const response = await prisma.user.delete({
-    where: {
-      email,
-    },
+    where: { email },
   });
-  if (response) {
-    return true;
-  } else {
-    return false;
-  }
+  return !!response;
 };
 
 export const deleteSector = async (id: string) => {
   const response = await prisma.sector.delete({
     where: { id },
   });
-
-  if (response) {
-    return true;
-  }
+  return !!response;
 };
 
 export const getUserByEmail = async (email: string) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      email,
-    },
+  return await prisma.user.findUnique({
+    where: { email },
     select: {
       name: true,
       role: true,
       email: true,
     },
   });
-
-  return user;
 };
 
 export const updateUser = async (email: string, data: any) => {
   await prisma.user.update({
-    where: {
-      email,
-    },
+    where: { email },
     data,
   });
 };
@@ -75,29 +60,23 @@ export const createSector = async (FormData: FormData) => {
     const name = FormData.get("name") as string;
 
     const createSector = await prisma.sector.create({
-      data: {
-        name,
-      },
+      data: { name },
     });
 
     if (!createSector) {
       throw new Error("Erro ao criar setor");
-    } else {
-      return true;
     }
-  } catch (error: any) {
+    return true;
+  } catch (error) {
     console.error("Erro:", error);
+    return false;
   }
 };
 
 export const updateRoleUser = async (email: string, data: any) => {
   await prisma.user.update({
-    where: {
-      email,
-    },
-    data: {
-      role: data.role,
-    },
+    where: { email },
+    data: { role: data.role },
   });
 };
 
@@ -115,7 +94,7 @@ export const updatePassword = async (
       data: { password: hashedPassword },
     });
 
-    return !!updatedPassword; // Retorna verdadeiro se o usuário foi atualizado com sucesso
+    return !!updatedPassword;
   } catch (error) {
     console.error("Erro ao atualizar senha:", error);
     return false;
@@ -128,14 +107,10 @@ export const getUsersOnSectorById = async (
   const users = await prisma.user.findMany({
     where: {
       sectors: {
-        some: {
-          id: sectorId,
-        },
+        some: { id: sectorId },
       },
     },
-    select: {
-      name: true,
-    },
+    select: { name: true },
   });
 
   return users.map((user) => user.name || "");
@@ -144,12 +119,8 @@ export const getUsersOnSectorById = async (
 export const includeUserToSectorById = async (id: string, sectorId: string) => {
   try {
     const getSector = await prisma.sector.findUnique({
-      where: {
-        id: sectorId,
-      },
-      select: {
-        id: true,
-      },
+      where: { id: sectorId },
+      select: { id: true },
     });
 
     if (!getSector) {
@@ -157,23 +128,18 @@ export const includeUserToSectorById = async (id: string, sectorId: string) => {
     }
 
     const includeUser = await prisma.user.update({
-      where: {
-        id: id,
-      },
+      where: { id },
       data: {
         sectors: {
-          connect: {
-            id: getSector.id,
-          },
+          connect: { id: getSector.id },
         },
       },
     });
 
     if (!includeUser) {
       throw new Error("Erro ao incluir usuário ao setor");
-    } else {
-      return true;
     }
+    return true;
   } catch (error) {
     console.error("Erro ao incluir usuário ao setor:", error);
     return false;
@@ -181,37 +147,33 @@ export const includeUserToSectorById = async (id: string, sectorId: string) => {
 };
 
 export const excludeUserToSectorById = async (id: string, sectorId: string) => {
-  const getSector = await prisma.sector.findUnique({
-    where: {
-      id: sectorId,
-    },
-    select: {
-      id: true,
-    },
-  });
-  if (!getSector) {
-    throw new Error("Erro ao encontrar setor");
-  }
-  const excludeUser = await prisma.user.update({
-    where: {
-      id: id,
-    },
-    data: {
-      sectors: {
-        disconnect: {
-          id: getSector.id,
+  try {
+    const getSector = await prisma.sector.findUnique({
+      where: { id: sectorId },
+      select: { id: true },
+    });
+
+    if (!getSector) {
+      throw new Error("Erro ao encontrar setor");
+    }
+
+    const excludeUser = await prisma.user.update({
+      where: { id },
+      data: {
+        sectors: {
+          disconnect: { id: getSector.id },
         },
       },
-    },
-    select: {
-      id: true,
-      name: true,
-    },
-  });
-  if (!excludeUser) {
-    throw new Error("Erro ao excluir usuário do setor");
-  } else {
+      select: { id: true, name: true },
+    });
+
+    if (!excludeUser) {
+      throw new Error("Erro ao excluir usuário do setor");
+    }
     return true;
+  } catch (error) {
+    console.error("Erro ao excluir usuário do setor:", error);
+    return false;
   }
 };
 
@@ -219,9 +181,7 @@ export const getUsersAndVerifySector = async (sectorId: string) => {
   const users = await prisma.user.findMany({
     where: {
       sectors: {
-        none: {
-          id: sectorId,
-        },
+        none: { id: sectorId },
       },
     },
   });
@@ -232,9 +192,7 @@ export const getUsersAlreadyHave = async (sectorId: string) => {
   const users = await prisma.user.findMany({
     where: {
       sectors: {
-        some: {
-          id: sectorId,
-        },
+        some: { id: sectorId },
       },
     },
   });

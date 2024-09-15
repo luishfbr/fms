@@ -2,21 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -67,50 +57,64 @@ export const CreateNewUser: React.FC<CreateButtonProps> = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Criar novo usuário</Button>
+        <Button className="w-full sm:w-auto">Criar novo usuário</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="w-full max-w-lg p-4 sm:p-6">
         <DialogHeader></DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="space-y-1">
-            <Label htmlFor="name">Nome</Label>
-            <Input
-              {...register("name")}
-              type="text"
-              required
-              autoComplete="off"
-            />
-            {errors.name && (
-              <p className="text-red-700 text-sm">{errors.name.message}</p>
-            )}
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              {...register("email")}
-              type="email"
-              required
-              autoComplete="off"
-            />
-            {errors.email && (
-              <p className="text-red-700 text-sm">{errors.email.message}</p>
-            )}
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="password">Senha</Label>
-            <Input {...register("password")} type="password" required />
-            {errors.password && (
-              <p className="text-red-700 text-sm">{errors.password.message}</p>
-            )}
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="passwordAgain">Digite Novamente</Label>
-            <Input {...register("passwordAgain")} type="password" required />
-            {errors.passwordAgain && (
-              <p className="text-red-700 text-sm">
-                {errors.passwordAgain.message}
-              </p>
-            )}
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="name">Nome</Label>
+              <Input
+                {...register("name")}
+                type="text"
+                required
+                autoComplete="off"
+                className="w-full"
+              />
+              {errors.name && (
+                <p className="text-red-700 text-sm">{errors.name.message}</p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                {...register("email")}
+                type="email"
+                required
+                autoComplete="off"
+                className="w-full"
+              />
+              {errors.email && (
+                <p className="text-red-700 text-sm">{errors.email.message}</p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="password">Senha</Label>
+              <Input
+                {...register("password")}
+                type="password"
+                required
+                className="w-full"
+              />
+              {errors.password && (
+                <p className="text-red-700 text-sm">{errors.password.message}</p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="passwordAgain">Digite Novamente</Label>
+              <Input
+                {...register("passwordAgain")}
+                type="password"
+                required
+                className="w-full"
+              />
+              {errors.passwordAgain && (
+                <p className="text-red-700 text-sm">
+                  {errors.passwordAgain.message}
+                </p>
+              )}
+            </div>
           </div>
           <DialogFooter className="mt-6">
             <DialogClose>

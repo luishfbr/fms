@@ -52,14 +52,15 @@ export const EditButton: React.FC<EditButtonProps> = ({ email }) => {
       showToast("Erro ao alterar senha.");
     }
   };
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button className="w-40" variant={"edit"}>
+        <Button className="w-full sm:w-40" variant={"edit"}>
           Trocar Senha
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="w-[400px]">
+      <AlertDialogContent className="w-full sm:w-[400px]">
         <AlertDialogHeader>
           <AlertDialogTitle>Troque a senha do usuário.</AlertDialogTitle>
           <AlertDialogDescription>

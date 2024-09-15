@@ -40,7 +40,7 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button className="w-40" variant={"destructive"}>
+        <Button className="w-full sm:w-40" variant={"destructive"}>
           Excluir Usuário
         </Button>
       </AlertDialogTrigger>

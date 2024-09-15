@@ -54,15 +54,16 @@ export const CardSetUserToSector = () => {
     getAllUsers();
     getAllSectors();
   }, []);
+
   return (
-    <Card>
+    <Card className="w-full h-full">
       <CardHeader>
         <CardDescription>
           Selecione o usuário que deseja adicionar setores.
         </CardDescription>
       </CardHeader>
-      <CardContent className="grid grid-cols-2">
-        <ScrollArea className="h-[230px] w-[360] rounded-md border">
+      <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <ScrollArea className="h-[230px] w-full rounded-md border">
           <div className="flex flex-col">
             <span className="text-center bg-primary py-1 text-white">
               Lista de Usuários
@@ -72,7 +73,8 @@ export const CardSetUserToSector = () => {
                 users.map((user, index) => (
                   <span
                     key={index}
-                    className="px-6 py-1 text-center text-sm text-muted-foreground"
+                    className="px-6 py-1 text-center text-sm text-muted-foreground cursor-pointer hover:bg-gray-200"
+                    onClick={() => SelectUser(user.name)}
                   >
                     {user.name}
                   </span>
@@ -85,7 +87,35 @@ export const CardSetUserToSector = () => {
             </div>
           </div>
         </ScrollArea>
+        <ScrollArea className="h-[230px] w-full rounded-md border">
+          <div className="flex flex-col">
+            <span className="text-center bg-primary py-1 text-white">
+              Lista de Setores
+            </span>
+            <div className="flex flex-col text-center">
+              {sectors.length > 0 ? (
+                sectors.map((sector, index) => (
+                  <span
+                    key={index}
+                    className="px-6 py-1 text-center text-sm text-muted-foreground cursor-pointer hover:bg-gray-200"
+                  >
+                    {sector.name}
+                  </span>
+                ))
+              ) : (
+                <span className="px-6 py-1 text-center text-sm text-muted-foreground">
+                  Nenhum setor encontrado.
+                </span>
+              )}
+            </div>
+          </div>
+        </ScrollArea>
       </CardContent>
+      <CardFooter className="flex justify-end">
+        <Button onClick={() => console.log(`User: ${selectUser}`)}>
+          Adicionar ao Setor
+        </Button>
+      </CardFooter>
     </Card>
   );
 };

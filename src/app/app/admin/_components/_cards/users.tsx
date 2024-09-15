@@ -55,7 +55,7 @@ export function CardUsers() {
   );
 
   return (
-    <Card className={`${styles.card} w-full h-[855px]`}>
+    <Card className={`${styles.card} w-full h-full`}>
       <CardHeader>
         <CardTitle>Lista de Usuários Cadastrados</CardTitle>
         <CardDescription>
@@ -72,13 +72,9 @@ export function CardUsers() {
             className={styles.searchInput}
           />
         </div>
-        <ScrollArea
-          className={`${styles.scrollArea} h-[620px] max-h-[1000px] rounded-md border`}
-        >
+        <ScrollArea className={`${styles.scrollArea} h-[60vh] max-h-[100vh] rounded-md border`}>
           <div className="overflow-x-auto">
-            <table
-              className={`${styles.table} min-w-full divide-y divide-gray-200`}
-            >
+            <table className={`${styles.table} min-w-full divide-y divide-gray-200`}>
               <thead className={styles.tableHeader}>
                 <tr>
                   <th className={styles.th}>Nome</th>
@@ -108,7 +104,7 @@ export function CardUsers() {
                               onDeleteSuccess={fetchData}
                             />
                             <DropdownMenuSeparator />
-                            <ChangeRole email={user.email} onChangeSuccess={fetchData}/>
+                            <ChangeRole email={user.email} onChangeSuccess={fetchData} />
                             <DropdownMenuSeparator />
                             <EditButton email={user.email} />
                           </DropdownMenuContent>

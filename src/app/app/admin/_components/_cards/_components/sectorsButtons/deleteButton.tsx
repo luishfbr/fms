@@ -1,5 +1,3 @@
-// components/DeleteButton.tsx
-
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -43,7 +41,7 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button className="w-40" variant={"destructive"}>
+        <Button className="w-full sm:w-40" variant={"destructive"}>
           Excluir Setor
         </Button>
       </AlertDialogTrigger>

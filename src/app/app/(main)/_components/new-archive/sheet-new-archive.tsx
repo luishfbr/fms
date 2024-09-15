@@ -100,7 +100,7 @@ export function SheetNewArchive({ id }: { id: string }) {
             Selecione o setor e o modelo que deseja criar.
           </SheetDescription>
         </SheetHeader>
-        <div className="grid grid-cols-2 my-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 my-4 gap-6">
           <Select onValueChange={handleChangeSector} disabled={isLoading}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder={isLoading ? "Carregando..." : "Selecione um Setor"} />

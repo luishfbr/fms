@@ -12,12 +12,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Image from "next/image";
 import example from "@/app/utils/assets/example.jpeg";
-import {
-  loginWithEmail,
-  LoginWithId,
-  verifyOtpCode,
-  verifyOtpCodeByEmail,
-} from "../_actions/login";
+import { loginWithEmail, verifyOtpCodeByEmail } from "../_actions/login";
 import { useToast } from "@/app/utils/ToastContext";
 import { useRouter } from "next/navigation";
 
@@ -46,8 +41,8 @@ export const NoQrCodeForm: React.FC<{ email: string }> = ({ email }) => {
   };
 
   return (
-    <div>
-      <CardHeader>
+    <div className="flex flex-col items-center justify-center p-4">
+      <CardHeader className="text-center">
         <CardTitle>Verifique o código de autenticação</CardTitle>
         <CardDescription>
           Acesse o aplicativo de autenticação em seu telefone. Igual mostra a
@@ -55,10 +50,10 @@ export const NoQrCodeForm: React.FC<{ email: string }> = ({ email }) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center justify-center">
-        <Image src={example} alt="QRCode" width={400} height={400} />
+        <Image src={example} alt="QRCode" width={300} height={300} className="max-w-full h-auto" />
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="w-44 mt-2 flex flex-col items-center justify-center gap-4"
+          className="w-full max-w-xs mt-4 flex flex-col items-center justify-center gap-4"
         >
           <Input
             {...register("code")}
@@ -70,7 +65,7 @@ export const NoQrCodeForm: React.FC<{ email: string }> = ({ email }) => {
           {errors.code && (
             <p className="text-red-700 text-sm">{errors.code.message}</p>
           )}
-          <Button type="submit">Verificar</Button>
+          <Button type="submit" className="w-full">Verificar</Button>
         </form>
       </CardContent>
     </div>

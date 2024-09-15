@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Image from "next/image";
-import { LoginWithId, updateTOTP, verifyOtpCode } from "../_actions/login";
+import { updateTOTP, verifyOtpCode } from "../_actions/login";
 import { useState } from "react";
 import { useToast } from "@/app/utils/ToastContext";
 import { useRouter } from "next/navigation";
@@ -41,7 +41,6 @@ export const QrCodeForm: React.FC<{ qrcode: string; id: string }> = ({
       if (verify === true) {
         showToast("Código de autenticação verificado com sucesso!");
         await updateTOTP(id);
-        await LoginWithId(id);
         router.push("/app");
       } else {
         showToast("Código de autenticação inválido.");
@@ -54,7 +53,7 @@ export const QrCodeForm: React.FC<{ qrcode: string; id: string }> = ({
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center justify-center p-4">
       <CardHeader>
         <CardTitle>Leia o Código Abaixo!</CardTitle>
         <CardDescription>
@@ -63,10 +62,10 @@ export const QrCodeForm: React.FC<{ qrcode: string; id: string }> = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center justify-center">
-        <Image src={qrcode} alt="QRCode" width={400} height={400} />
+        <Image src={qrcode} alt="QRCode" width={300} height={300} />
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="w-44 flex flex-col items-center justify-center gap-4"
+          className="w-full max-w-xs flex flex-col items-center justify-center gap-4 mt-4"
         >
           <Input
             {...register("code")}
@@ -78,7 +77,7 @@ export const QrCodeForm: React.FC<{ qrcode: string; id: string }> = ({
           {errors.code && (
             <p className="text-red-700 text-sm">{errors.code.message}</p>
           )}
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting} className="w-full">
             {isSubmitting ? "Verificando..." : "Verificar"}
           </Button>
         </form>

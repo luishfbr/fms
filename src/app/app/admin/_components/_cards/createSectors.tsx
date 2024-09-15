@@ -4,21 +4,10 @@ import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -72,17 +61,17 @@ export const CreateNewSector: React.FC<CreateButtonProps> = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Criar novo setor</Button>
+        <Button className="w-full sm:w-auto">Criar novo setor</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="w-full max-w-lg p-4 sm:p-6">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-6">
             <Label htmlFor="name">Nome do Setor</Label>
-            <Input type="text" required {...register("name")} />
+            <Input type="text" required {...register("name")} className="w-full" />
           </div>
           <DialogFooter>
             <DialogClose>
-              <Button type="submit" disabled={isSubmitting || !isValid}>
+              <Button type="submit" disabled={isSubmitting || !isValid} className="w-full sm:w-auto">
                 {isSubmitting ? "Criando..." : "Criar Setor"}
               </Button>
             </DialogClose>

@@ -10,11 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  LockClosedIcon,
-  MixerVerticalIcon,
-  RocketIcon,
-} from "@radix-ui/react-icons";
+import { LockClosedIcon, MixerVerticalIcon, RocketIcon } from "@radix-ui/react-icons";
 import { Session } from "next-auth";
 
 type UserDropdownProps = {
@@ -22,7 +18,7 @@ type UserDropdownProps = {
 };
 
 export function UserDropdown({ user }: UserDropdownProps) {
-  if (!user) return;
+  if (!user) return null;
 
   return (
     <DropdownMenu>
@@ -46,7 +42,7 @@ export function UserDropdown({ user }: UserDropdownProps) {
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-72" align="end" forceMount>
+      <DropdownMenuContent className="w-64 sm:w-72" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user.name}</p>
@@ -56,20 +52,10 @@ export function UserDropdown({ user }: UserDropdownProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <MixerVerticalIcon className="w-3 h-3 mr-3" />
-            Configuraçoes
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <RocketIcon className="w-3 h-3 mr-3" />
-            Upgrade
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => logout()}>
           <LockClosedIcon className="w-3 h-3 mr-3" />
-          Log out
+          Sair
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

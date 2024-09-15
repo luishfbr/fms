@@ -20,10 +20,12 @@ interface User {
 }
 
 export default function Page() {
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<User | null>(null);
   const getUser = async () => {
     const data = await User();
-    setUser(data);
+    if (data && data.id && data.role) {
+      setUser({ id: data.id, role: data.role });
+    }
   };
   useEffect(() => {
     getUser();
@@ -33,12 +35,12 @@ export default function Page() {
       <DashboardPage>
         <DashboardPageHeader>
           <DashboardPageHeaderTitle>Arquivos</DashboardPageHeaderTitle>
-          {user?.role === "CREATOR" || user?.role === "ADMIN" ? (
+          {user && (user.role === "CREATOR" || user.role === "ADMIN") && (
             <DashboardPageHeaderNav className="flex gap-4">
               <SheetNewModel id={user.id} />
               <SheetNewArchive id={user.id} />
             </DashboardPageHeaderNav>
-          ) : null}
+          )}
         </DashboardPageHeader>
         <DashboardPageMain>
           <ContainerTables />

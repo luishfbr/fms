@@ -7,8 +7,6 @@ import {
   DashboardSidebarNav,
   DashboardSidebarNavMain,
   DashboardSidebarNavLink,
-  DashboardSidebarNavHeader,
-  DashboardSidebarNavHeaderTitle,
   DashboardSidebarFooter,
 } from "@/components/dashboard/sidebar";
 import { usePathname } from "next/navigation";
@@ -24,33 +22,27 @@ type MainSidebarProps = {
 
 export function MainSidebar({ user }: MainSidebarProps) {
   const pathname = usePathname();
-  const [isAdmin, setIsAdmin] = useState<boolean>();
-  const [isCreator, setIsCreator] = useState<boolean>();
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [isCreator, setIsCreator] = useState<boolean | null>(null);
 
-  const isActive = (path: string) => {
-    return pathname === path;
-  };
+  const isActive = (path: string) => pathname === path;
 
   useEffect(() => {
     const checkAdmin = async () => {
       const adminStatus = await adminButton();
-      setIsAdmin(adminStatus);
+      setIsAdmin(adminStatus || false);
     };
 
     const checkCreator = async () => {
       const creatorStatus = await creatorButton();
-      setIsCreator(creatorStatus);
+      setIsCreator(creatorStatus || false);
     };
 
     checkAdmin();
     checkCreator();
   }, []);
 
-  if (isAdmin === null) {
-    return <div>Loading...</div>;
-  }
-
-  if (isCreator === null) {
+  if (isAdmin === null || isCreator === null) {
     return <div>Loading...</div>;
   }
 
@@ -65,28 +57,14 @@ export function MainSidebar({ user }: MainSidebarProps) {
             <DashboardSidebarNavLink href="/app" active={isActive("/app")}>
               Tabela de Arquivos
             </DashboardSidebarNavLink>
-            {isAdmin ? (
+            {isAdmin && (
               <DashboardSidebarNavLink
                 href="/app/admin"
                 active={isActive("/app/admin")}
               >
                 Configurações de Administrador
               </DashboardSidebarNavLink>
-            ) : null}
-          </DashboardSidebarNavMain>
-        </DashboardSidebarNav>
-
-        <DashboardSidebarNav className="mt-auto">
-          <DashboardSidebarNavHeader>
-            <DashboardSidebarNavHeaderTitle>
-              Links extras
-            </DashboardSidebarNavHeaderTitle>
-          </DashboardSidebarNavHeader>
-          <DashboardSidebarNavMain>
-            <DashboardSidebarNavLink href="/">
-              Precisa de ajuda?
-            </DashboardSidebarNavLink>
-            <DashboardSidebarNavLink href="/">Site</DashboardSidebarNavLink>
+            )}
           </DashboardSidebarNavMain>
         </DashboardSidebarNav>
       </DashboardSidebarMain>

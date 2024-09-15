@@ -10,19 +10,21 @@ import { VerifySession } from "../_actions/login";
 
 export const AuthForm = () => {
   const router = useRouter();
-  const ExistSession = async () => {
+  const checkSession = async () => {
     const response = await VerifySession();
-    if (response === true) {
+    if (response) {
       router.push("/app");
     }
   };
+
   useEffect(() => {
-    ExistSession();
+    checkSession();
   }, []);
+
   return (
     <ToastProvider>
-      <div className="flex items-center justify-center h-screen mx-auto bg-primary">
-        <Tabs defaultValue="login" className="w-[500px] ">
+      <div className="flex items-center justify-center min-h-screen mx-auto bg-primary p-4">
+        <Tabs defaultValue="login" className="w-full max-w-md">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Entrar</TabsTrigger>
             <TabsTrigger value="register">Registrar</TabsTrigger>

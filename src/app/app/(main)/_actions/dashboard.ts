@@ -1,11 +1,9 @@
 "use server";
 
-import { NewModelProps } from "@/app/types/types";
+import { FileData, NewModelProps } from "@/app/types/types";
 import { prisma } from "@/app/utils/prisma";
 import { auth } from "@/services/auth";
-import { Field } from "../_components/new-model/sheet-new-model";
 import { FieldType } from "@prisma/client";
-import { v4 as uuidv4 } from "uuid";
 import { FileInfo } from "../_components/menu/menu-component";
 
 export const checkButton = async () => {
@@ -116,10 +114,8 @@ export const getModelById = async (id: string) => {
   return await prisma.fileTemplate.findUnique({ where: { id } });
 };
 
-export const createNewFile = async (data: any) => {
-  const commonId = uuidv4();
-  const dataWithCommonId = data.map((item: any) => ({ ...item, commonId }));
-  return await prisma.file.createMany({ data: dataWithCommonId });
+export const createNewFile = async (fileData: FileData[]) => {
+  return await prisma.file.createMany({ data: fileData });
 };
 
 export const GetFilesByFieldIds = async (fieldIds: string[]) => {

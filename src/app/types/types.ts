@@ -1,6 +1,6 @@
 import { Field } from "../app/(main)/_components/new-model/sheet-new-model";
 
-export interface WorkContractProps {
+export interface BaseProps {
   id: string;
   shelf: string;
   box: string;
@@ -8,36 +8,31 @@ export interface WorkContractProps {
   name: string;
   cpf: string;
   registration: string;
-  addData: string;
-  logoutDate: string;
   fileTemplateId?: string;
 }
 
-export interface PointArchiveProps {
-  id: string;
-  shelf: string;
-  box: string;
-  folder: string;
-  name: string;
-  cpf: string;
-  registration: string;
+export interface WorkContractProps extends BaseProps {
+  addData: string;
+  logoutDate: string;
+}
+
+export interface PointArchiveProps extends BaseProps {
   month: string;
   year: string;
-  fileTemplateId?: string;
 }
 
 export interface InputBaseProps {
-  shelf: string | null;
-  box: string | null;
-  folder: string | null;
-  name: string | null;
-  cpf: string | null;
-  cnpj: string | null;
-  registration: string | null;
-  month: string | null;
-  year: string | null;
-  addData: string | null;
-  logoutDate: string | null;
+  shelf?: string;
+  box?: string;
+  folder?: string;
+  name?: string;
+  cpf?: string;
+  cnpj?: string;
+  registration?: string;
+  month?: string;
+  year?: string;
+  addData?: string;
+  logoutDate?: string;
 }
 
 export interface NewModelProps {
@@ -46,3 +41,8 @@ export interface NewModelProps {
   fields: Field[];
 }
 
+export interface FileData {
+  fileTemplateId: string;
+  fieldId: string;
+  value: string;
+}

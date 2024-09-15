@@ -2,8 +2,6 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/app/utils/prisma";
 import Credentials from "next-auth/providers/credentials";
-import { authenticator } from "otplib";
-import { compareSync } from "bcrypt-ts";
 
 export const {
   handlers: { GET, POST },

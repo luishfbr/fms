@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useRouter } from "next/navigation";
+import { v4 as uuidv4 } from "uuid";
 
 export const SelectedModelForm = ({ modelId }: { modelId: string }) => {
   const { showToast } = useToast();
@@ -124,11 +125,15 @@ export const SelectedModelForm = ({ modelId }: { modelId: string }) => {
 
   const onSubmit: SubmitHandler<Record<string, string>> = async (data) => {
     setIsLoading(true);
+
     const formattedFields = fields.map(field => ({
       fileTemplateId: modelId,
       fieldId: field.id,
-      value: data[field.id]
+      value: data[field.id],
+
     }));
+
+
 
     try {
       await createNewFile(formattedFields);

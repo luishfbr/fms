@@ -9,17 +9,14 @@ import { z } from "zod";
 
 type data = z.infer<typeof registerSchema>;
 
-// Definição do salt para hash de senha
 const salt = genSaltSync(10);
 
 export default async function RegisterUser(data: data) {
   try {
     const { name, email, password, role } = data;
 
-    // Hash da senha
     const hashedPassword = hashSync(password, salt);
 
-    // Criando o OTP Secret
     const secretBuffer = randomBytes(20);
     const otpSecret = base32.encode(secretBuffer).replace(/=/g, "");
 

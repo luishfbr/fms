@@ -43,17 +43,9 @@ export const ChangeRole: React.FC<ChangeRoleProps> = ({
   const [roleSelected, setRoleSelected] = useState<string>("user");
 
   // Set roleSelected and update the form value
-  const selectAdmin = () => {
-    setRoleSelected("ADMIN");
-    setValue("role", "ADMIN");
-  };
-  const selectUser = () => {
-    setRoleSelected("USER");
-    setValue("role", "USER");
-  };
-  const selectCreator = () => {
-    setRoleSelected("CREATOR");
-    setValue("role", "CREATOR");
+  const selectRole = (role: string) => {
+    setRoleSelected(role);
+    setValue("role", role);
   };
 
   const onSubmit = async (data: UserFormData) => {
@@ -70,23 +62,23 @@ export const ChangeRole: React.FC<ChangeRoleProps> = ({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button className="w-40">Editar Permissão</Button>
+        <Button className="w-full sm:w-40">Editar Permissão</Button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="w-[450px]">
+      <AlertDialogContent className="w-full sm:w-[450px]">
         <AlertDialogHeader>
           <AlertDialogTitle>Editar Usuário</AlertDialogTitle>
           <AlertDialogDescription>
             Preencha os dados do usuário abaixo:
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="grid grid-cols-3 gap-2">
-          <Button variant={"outline"} onClick={selectAdmin}>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <Button variant={"outline"} onClick={() => selectRole("ADMIN")}>
             Administrador
           </Button>
-          <Button variant={"outline"} onClick={selectUser}>
+          <Button variant={"outline"} onClick={() => selectRole("USER")}>
             Usuário
           </Button>
-          <Button variant={"outline"} onClick={selectCreator}>
+          <Button variant={"outline"} onClick={() => selectRole("CREATOR")}>
             Criador
           </Button>
         </div>

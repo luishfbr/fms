@@ -20,7 +20,7 @@ export const SectorSelect: React.FC<SectorSelectProps> = ({
   setSelectedSector,
 }) => {
   const sortedSectors = useMemo(() =>
-    [...sectors].sort((a, b) => a.name.localeCompare(b.name)),
+    sectors.sort((a, b) => a.name.localeCompare(b.name)),
     [sectors]
   );
 
@@ -29,7 +29,7 @@ export const SectorSelect: React.FC<SectorSelectProps> = ({
       onValueChange={setSelectedSector}
       value={selectedSector || undefined}
     >
-      <SelectTrigger className="w-full md:w-64">
+      <SelectTrigger className="w-full sm:w-48 md:w-64 lg:w-80">
         <SelectValue placeholder="Selecione um Setor" />
       </SelectTrigger>
       <SelectContent>
