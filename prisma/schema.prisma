@@ -67,17 +67,21 @@ enum FieldType {
     dia
     mes
     ano
+    prateleira
+    caixa
+    pasta
 }
 
 model File {
-    id             String       @id @default(cuid())
-    data           Json
-    fileTemplate   FileTemplate @relation(onDelete: Cascade, fields: [fileTemplateId], references: [id])
-    field          Field        @relation(onDelete: Cascade, fields: [fieldId], references: [id])
-    createdAt      DateTime     @default(now())
-    updatedAt      DateTime     @updatedAt
+    id             String @id @default(cuid())
+    value          String
     fileTemplateId String
     fieldId        String
+    commonId       String?
+
+    field Field @relation(onDelete: Cascade, fields: [fieldId], references: [id])
+
+    FileTemplate FileTemplate? @relation(fields: [fileTemplateId], references: [id])
 }
 
 model Account {

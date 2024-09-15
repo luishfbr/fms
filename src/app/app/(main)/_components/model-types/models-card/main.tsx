@@ -1,13 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fieldsByFiletemplateId } from "../../../_actions/dashboard";
+import { createNewFile, fieldsByFiletemplateId } from "../../../_actions/dashboard";
 import { Field } from "../../new-model/sheet-new-model";
 import InputMask from "react-input-mask";
 import styles from "../../../../styles/main.module.css";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/app/utils/ToastContext";
 
 export const SelectedModelForm = ({ modelId }: { modelId: string }) => {
+  const { showToast } = useToast()
   const [fields, setFields] = useState<Field[]>([]);
+  const { register, handleSubmit, setValue } = useForm<Record<string, string>>();
 
   const loadFields = async () => {
     const fields = await fieldsByFiletemplateId(modelId);
@@ -16,6 +21,7 @@ export const SelectedModelForm = ({ modelId }: { modelId: string }) => {
         fields.map((field) => ({
           ...field,
           value: "",
+          commonId: "",
           type: field.fieldType,
         }))
       );
@@ -44,6 +50,9 @@ export const SelectedModelForm = ({ modelId }: { modelId: string }) => {
     dia: "Dia",
     mes: "Mês",
     ano: "Ano",
+    prateleira: "Prateleira",
+    caixa: "Caixa",
+    pasta: "Pasta",
   };
 
   const renderInput = (field: Field) => {
@@ -60,8 +69,7 @@ export const SelectedModelForm = ({ modelId }: { modelId: string }) => {
             className={styles.inputStyles}
             id={field.id}
             mask={mask}
-            value={field.value}
-            onChange={(e) => handleInputChange(e, field.id)}
+            {...register(field.id)}
           />
         </>
       );
@@ -78,8 +86,8 @@ export const SelectedModelForm = ({ modelId }: { modelId: string }) => {
               type="text"
               id={field.id}
               className={styles.inputStyles}
-              onChange={(e) => handleInputChange(e, field.id)}
               placeholder="Digite o nome completo"
+              {...register(field.id)}
             />
           </>
         );
@@ -95,8 +103,7 @@ export const SelectedModelForm = ({ modelId }: { modelId: string }) => {
               max="31"
               id={field.id}
               className={styles.inputStyles}
-              value={field.value}
-              onChange={(e) => handleInputChange(e, field.id)}
+              {...register(field.id)}
             />
           </>
         );
@@ -112,8 +119,7 @@ export const SelectedModelForm = ({ modelId }: { modelId: string }) => {
               max="12"
               id={field.id}
               className={styles.inputStyles}
-              value={field.value}
-              onChange={(e) => handleInputChange(e, field.id)}
+              {...register(field.id)}
             />
           </>
         );
@@ -129,8 +135,7 @@ export const SelectedModelForm = ({ modelId }: { modelId: string }) => {
               max="2099"
               id={field.id}
               className={styles.inputStyles}
-              value={field.value}
-              onChange={(e) => handleInputChange(e, field.id)}
+              {...register(field.id)}
             />
           </>
         );
@@ -144,33 +149,37 @@ export const SelectedModelForm = ({ modelId }: { modelId: string }) => {
               type="text"
               id={field.id}
               className={styles.inputStyles}
-              value={field.value}
-              onChange={(e) => handleInputChange(e, field.id)}
               placeholder="Digite o valor"
+              {...register(field.id)}
             />
           </>
         );
     }
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    id: string
-  ) => {
-    setFields((prevFields) =>
-      prevFields.map((field) =>
-        field.id === id ? { ...field, value: e.target.value } : field
-      )
-    );
+  const onSubmit: SubmitHandler<Record<string, string>> = async (data) => {
+    const formattedFields = fields.map(field => ({
+      fileTemplateId: modelId,
+      fieldId: field.id,
+      value: data[field.id]
+    }));
+
+    try {
+      await createNewFile(formattedFields);
+      showToast("Arquivo criado com sucesso");
+    } catch (error) {
+      console.error('Erro ao criar arquivo:', error);
+    }
   };
 
   return (
-    <div className={styles.formContainer}>
+    <form onSubmit={handleSubmit(onSubmit)} className={styles.formContainer}>
       {fields.map((field) => (
         <div key={field.id} className={styles.fieldContainer}>
           {renderInput(field)}
         </div>
       ))}
-    </div>
+      <Button className={styles.submitButton}>Criar</Button>
+    </form>
   );
 };

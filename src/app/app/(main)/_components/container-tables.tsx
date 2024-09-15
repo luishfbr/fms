@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TableContainer } from "./table-container";
+import { Input } from "@/components/ui/input";
 
 interface Sector {
   id: string;
@@ -27,6 +28,7 @@ export const ContainerTables = () => {
   const [selectedSector, setSelectedSector] = useState<Sector | null>(null);
   const [models, setModels] = useState<Model[]>([]);
   const [selectedModel, setSelectedModel] = useState<Model | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   const fetchSectors = async () => {
     const response = await getSectors();
@@ -43,6 +45,10 @@ export const ContainerTables = () => {
   const handleChangeModel = (modelId: string) => {
     const model = models.find((model) => model.id === modelId) || null;
     setSelectedModel(model);
+  };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
   };
 
   useEffect(() => {
@@ -79,9 +85,17 @@ export const ContainerTables = () => {
             </SelectContent>
           </Select>
         )}
+
+        <Input
+          type="text"
+          placeholder="Pesquisar..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+          className="w-64"
+        />
       </div>
 
-      {selectedModel && <TableContainer modelId={selectedModel.id} />}
+      {selectedModel && <TableContainer modelId={selectedModel.id} searchTerm={searchTerm} />}
     </div>
   );
 };

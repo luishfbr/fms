@@ -87,14 +87,14 @@ export function SheetNewModel({ id }: { id: string }) {
 
     const formData = {
       modelName: data.modelName,
-      sectorId: selectedSector, // Certifique-se de que o setor está selecionado
+      sectorId: selectedSector,
       fields: fields,
     };
 
     const newModel = await createNewModel(formData);
     if (newModel) {
       showToast("Modelo criado com sucesso!");
-      reset(); // Reseta o formulário após a criação
+      reset();
     } else {
       showToast("Erro ao criar modelo. Por favor, tente novamente.");
     }
@@ -114,14 +114,14 @@ export function SheetNewModel({ id }: { id: string }) {
       type: fieldType,
     };
     setFields((prevFields) => [...prevFields, newField]);
-    setDisabledFields((prev) => ({ ...prev, [fieldType]: true })); // Disable button for this field type
+    setDisabledFields((prev) => ({ ...prev, [fieldType]: true })); 
   };
 
   const removeField = (fieldId: string, fieldType: string) => {
     setFields((prevFields) =>
       prevFields.filter((field) => field.id !== fieldId)
     );
-    setDisabledFields((prev) => ({ ...prev, [fieldType]: false })); // Re-enable button for this field type
+    setDisabledFields((prev) => ({ ...prev, [fieldType]: false }));
   };
 
   useEffect(() => {

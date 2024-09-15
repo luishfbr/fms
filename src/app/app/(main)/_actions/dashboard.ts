@@ -5,6 +5,7 @@ import { prisma } from "@/app/utils/prisma";
 import { auth } from "@/services/auth";
 import { Field } from "../_components/new-model/sheet-new-model";
 import { FieldType } from "@prisma/client";
+import { v4 as uuidv4 } from "uuid";
 
 export const checkButton = async () => {
   const session = await auth();
@@ -19,8 +20,6 @@ export const checkButton = async () => {
         id: true,
       },
     });
-
-    console.log(response);
 
     if (response?.role === "CREATOR" || response?.role === "ADMIN") {
       return { id: response.id, havePermission: true };
@@ -140,7 +139,6 @@ export const createNewModel = async (formData: NewModelProps) => {
   const sectorId = formData.sectorId as string;
   const fields = formData.fields as Field[];
 
-  // Criar o novo modelo
   const newModelName = await prisma.fileTemplate.create({
     data: {
       modelName: modelName,
@@ -151,21 +149,40 @@ export const createNewModel = async (formData: NewModelProps) => {
   if (newModelName) {
     const fileTemplateId = newModelName.id as string;
 
-    // Criar os campos do modelo, adaptando para o formato correto esperado pelo Prisma
-    const fieldsData = fields.map((field) => ({
-      fieldType: field.type as FieldType, // Certifique-se de que o tipo de campo está correto
+    const standardFields = [
+      {
+        fieldType: FieldType.prateleira,
+        fieldLabel: "Prateleira",
+        fileTemplateId: fileTemplateId,
+      },
+      {
+        fieldType: FieldType.caixa,
+        fieldLabel: "Caixa",
+        fileTemplateId: fileTemplateId,
+      },
+      {
+        fieldType: FieldType.pasta,
+        fieldLabel: "Pasta",
+        fileTemplateId: fileTemplateId,
+      },
+    ];
+
+    const customFields = fields.map((field) => ({
+      fieldType: field.type as FieldType,
       fieldLabel: field.value,
       fileTemplateId: fileTemplateId,
     }));
 
+    const allFields = [...standardFields, ...customFields];
+
     await prisma.field.createMany({
-      data: fieldsData,
+      data: allFields,
     });
 
-    return newModelName; // Retorna o modelo criado para confirmar a criação
+    return newModelName;
   }
 
-  return null; // Retorna null se houver falha
+  return null;
 };
 
 export const GetModelsById = async (id: string) => {
@@ -193,6 +210,7 @@ export const GetHeadersByFileTemplateId = async (id: string) => {
     select: {
       fieldType: true,
       fieldLabel: true,
+      id: true,
     },
   });
 
@@ -216,4 +234,77 @@ export const getModelById = async (id: string) => {
     },
   });
   return response;
+};
+
+export const createNewFile = async (data: any) => {
+  const commonId = uuidv4();
+  const dataWithCommonId = data.map((item: any) => ({
+    ...item,
+    commonId: commonId,
+  }));
+  const response = await prisma.file.createMany({
+    data: dataWithCommonId,
+  });
+  return response;
+};
+
+export const GetFilesByFieldIds = async (fieldIds: string[]) => {
+  const response = await prisma.file.findMany({
+    where: {
+      fieldId: {
+        in: fieldIds,
+      },
+    },
+    select: {
+      id: true,
+      value: true,
+      fieldId: true,
+    },
+  });
+
+  // Agrupar arquivos por fieldId
+  const groupedFiles = response.reduce((acc, file) => {
+    if (!acc[file.fieldId]) {
+      acc[file.fieldId] = [];
+    }
+    acc[file.fieldId].push(file);
+    return acc;
+  }, {} as Record<string, typeof response>);
+
+  // Formatar resposta como um array de linhas (cada linha é um objeto com fieldId como chave e adicionando o ID do arquivo)
+  const formattedResponse =
+    Object.values(groupedFiles)[0]?.map((_, index) => {
+      const row = fieldIds.reduce((acc, fieldId) => {
+        const file = groupedFiles[fieldId]?.[index];
+        if (file) {
+          acc[fieldId] = file.value;
+          acc.id = file.id; // Adiciona o id do arquivo ao objeto da linha
+        }
+        return acc;
+      }, {} as Record<string, string>);
+      return row;
+    }) || [];
+
+  return formattedResponse;
+};
+
+export const deleteFile = async (fileId: string) => {
+  const getCommonId = await prisma.file.findUnique({
+    where: {
+      id: fileId,
+    },
+    select: {
+      commonId: true,
+    },
+  });
+
+  if (getCommonId) {
+    const response = await prisma.file.deleteMany({
+      where: {
+        commonId: getCommonId.commonId,
+      },
+    });
+    return response;
+  }
+  return null;
 };
