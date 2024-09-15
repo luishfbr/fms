@@ -4,13 +4,12 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LockClosedIcon, MixerVerticalIcon, RocketIcon } from "@radix-ui/react-icons";
+import { LockClosedIcon } from "@radix-ui/react-icons";
 import { Session } from "next-auth";
 
 type UserDropdownProps = {
@@ -29,7 +28,7 @@ export function UserDropdown({ user }: UserDropdownProps) {
         >
           <Avatar className="h-8 w-8">
             <AvatarImage src={user.image as string} alt={user.name as string} />
-            <AvatarFallback>U</AvatarFallback>
+            <AvatarFallback>{user.name?.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
 
           <div className="flex flex-col flex-1 space-y-1 text-left">

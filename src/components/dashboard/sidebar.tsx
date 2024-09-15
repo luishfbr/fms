@@ -30,7 +30,7 @@ export function DashboardSidebarHeader({
   return (
     <header
       className={cn([
-        "px-6 h-14 flex justify-center items-center border-b border-border",
+        "px-6 h-14  flex justify-center items-center border-b border-border",
         className,
       ])}
     >

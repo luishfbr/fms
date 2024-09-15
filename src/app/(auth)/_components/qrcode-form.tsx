@@ -11,16 +11,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Image from "next/image";
-import { updateTOTP, verifyOtpCode } from "../_actions/login";
+import { loginWithEmail, updateTOTP, verifyOtpCode } from "../_actions/login";
 import { useState } from "react";
 import { useToast } from "@/app/utils/ToastContext";
 import { useRouter } from "next/navigation";
 
 type QrCodeFormData = z.infer<typeof qrcodeSchema>;
 
-export const QrCodeForm: React.FC<{ qrcode: string; id: string }> = ({
+export const QrCodeForm: React.FC<{ qrcode: string; id: string; email: string }> = ({
   qrcode,
   id,
+  email,
 }) => {
   const { showToast } = useToast();
   const router = useRouter();
@@ -41,6 +42,7 @@ export const QrCodeForm: React.FC<{ qrcode: string; id: string }> = ({
       if (verify === true) {
         showToast("Código de autenticação verificado com sucesso!");
         await updateTOTP(id);
+        await loginWithEmail(email);
         router.push("/app");
       } else {
         showToast("Código de autenticação inválido.");

@@ -1,9 +1,11 @@
 "use server";
 
-import { FileData, NewModelProps } from "@/app/types/types";
+import { NewModelProps } from "@/app/types/types";
 import { prisma } from "@/app/utils/prisma";
 import { auth } from "@/services/auth";
+
 import { FieldType } from "@prisma/client";
+import { v4 as uuidv4 } from "uuid";
 import { FileInfo } from "../_components/menu/menu-component";
 
 export const checkButton = async () => {
@@ -114,8 +116,10 @@ export const getModelById = async (id: string) => {
   return await prisma.fileTemplate.findUnique({ where: { id } });
 };
 
-export const createNewFile = async (fileData: FileData[]) => {
-  return await prisma.file.createMany({ data: fileData });
+export const createNewFile = async (data: any) => {
+  const commonId = uuidv4();
+  const dataWithCommonId = data.map((item: any) => ({ ...item, commonId }));
+  return await prisma.file.createMany({ data: dataWithCommonId });
 };
 
 export const GetFilesByFieldIds = async (fieldIds: string[]) => {
@@ -187,20 +191,12 @@ export const updateFile = async (fileId: string, fileInfos: FileInfo[]) => {
     throw new Error("File not found");
   }
 
-  const updatePromises = fileInfos.map((info) =>
+  const updatePromises = fileInfos.map((fileInfo) =>
     prisma.file.update({
-      where: {
-        commonId: file.commonId,
-      },
-      data: { value: info.value },
+      where: { id: fileInfo.id },
+      data: { value: fileInfo.value },
     })
   );
 
-  try {
-    const results = await prisma.$transaction(updatePromises);
-    return results.length > 0;
-  } catch (error) {
-    console.error("Error updating files:", error);
-    throw new Error("Failed to update files");
-  }
+  await Promise.all(updatePromises);
 };

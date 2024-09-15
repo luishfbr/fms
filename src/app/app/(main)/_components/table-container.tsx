@@ -5,10 +5,14 @@ import {
   GetFilesByFieldIds,
   GetHeadersByFileTemplateId,
   GetModelsById,
+  deleteFile,
 } from "../_actions/dashboard";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { MenuComponent } from "./menu/menu-component";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/app/utils/ToastContext";
 
 interface File {
   id: string;
@@ -29,9 +33,13 @@ interface Field {
 }
 
 export const TableContainer = ({ modelId, searchTerm }: { modelId: string, searchTerm: string }) => {
+  const { showToast } = useToast();
   const [fields, setFields] = useState<Field[]>([]);
   const [files, setFiles] = useState<Record<string, string | undefined>[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filesPerPage] = useState(10);
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
 
   const getModel = useCallback(async () => {
     try {
@@ -94,15 +102,62 @@ export const TableContainer = ({ modelId, searchTerm }: { modelId: string, searc
     );
   }, [files, searchTerm]);
 
+  const indexOfLastFile = currentPage * filesPerPage;
+  const indexOfFirstFile = indexOfLastFile - filesPerPage;
+  const currentFiles = filteredFiles.slice(indexOfFirstFile, indexOfLastFile);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  const handleSelectFile = (fileId: string) => {
+    setSelectedFiles((prevSelectedFiles) =>
+      prevSelectedFiles.includes(fileId)
+        ? prevSelectedFiles.filter((id) => id !== fileId)
+        : [...prevSelectedFiles, fileId]
+    );
+  };
+
+  const handleDeleteSelected = async () => {
+    try {
+      for (const fileId of selectedFiles) {
+        await deleteFile(fileId);
+      }
+      showToast("Arquivos deletados com sucesso");
+      setSelectedFiles([]);
+      fetchData();
+    } catch (error) {
+      console.error("Erro ao deletar arquivos:", error);
+      showToast("Erro ao deletar arquivos");
+    }
+  };
+
   if (isLoading) {
     return <Skeleton className="w-full h-64" />;
   }
 
   return (
     <div className="overflow-x-auto">
+      <div className="flex justify-end mb-4">
+        {selectedFiles.length > 0 && (
+          <Button onClick={handleDeleteSelected} variant="destructive">
+            Excluir Selecionados
+          </Button>
+        )}
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="text-center">
+              <Checkbox
+                checked={selectedFiles.length === currentFiles.length}
+                onCheckedChange={(checked) =>
+                  setSelectedFiles(
+                    checked
+                      ? currentFiles.map((file) => file.id).filter((id): id is string => id !== undefined)
+                      : []
+                  )
+                }
+              />
+            </TableHead>
             {fields.map((field) => (
               <TableHead className="text-center" key={field.id}>
                 {field.fieldLabel}
@@ -112,15 +167,21 @@ export const TableContainer = ({ modelId, searchTerm }: { modelId: string, searc
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredFiles.length === 0 ? (
+          {currentFiles.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={fields.length + 1} className="text-center">
+              <TableCell colSpan={fields.length + 2} className="text-center">
                 Nenhum resultado encontrado
               </TableCell>
             </TableRow>
           ) : (
-            filteredFiles.map((fileRow, rowIndex) => (
+            currentFiles.map((fileRow, rowIndex) => (
               <TableRow key={rowIndex}>
+                <TableCell className="text-center">
+                  <Checkbox
+                    checked={selectedFiles.includes(fileRow.id || '')}
+                    onCheckedChange={() => handleSelectFile(fileRow.id || '')}
+                  />
+                </TableCell>
                 {fields.map((field) => (
                   <TableCell key={field.id} className="text-center">
                     {fileRow[field.id] || "-"}
@@ -134,6 +195,20 @@ export const TableContainer = ({ modelId, searchTerm }: { modelId: string, searc
           )}
         </TableBody>
       </Table>
+      {filteredFiles.length > filesPerPage && (
+        <div className="flex justify-center mt-4">
+          {Array.from({ length: Math.ceil(filteredFiles.length / filesPerPage) }, (_, index) => (
+            <Button
+              key={index + 1}
+              onClick={() => paginate(index + 1)}
+              variant={currentPage === index + 1 ? "default" : "outline"}
+              className="mx-1"
+            >
+              {index + 1}
+            </Button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -80,14 +80,10 @@ export function MenuComponent({ fileId, onUpdate }: MenuComponentProps) {
                 value: (document.getElementById(info.id) as HTMLInputElement)?.value || info.value
             }));
 
-            const response = await updateFile(fileId, updatedFileInfos);
-            if (response) {
-                setIsEditing(false);
-                onUpdate();
-                showToast("Alterações salvas com sucesso");
-            } else {
-                throw new Error("Falha ao atualizar o arquivo");
-            }
+            await updateFile(fileId, updatedFileInfos);
+            setIsEditing(false);
+            onUpdate();
+            showToast("Alterações salvas com sucesso");
         } catch (error) {
             console.error("Erro ao salvar alterações:", error);
             showToast("Erro ao salvar as alterações");

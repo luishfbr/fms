@@ -126,8 +126,8 @@ export function LoginForm() {
           </div>
         )}
 
-        {infoUser && qrCode && !isTotpEnable && (
-          <QrCodeForm qrcode={qrCode} id={infoUser?.id} />
+        {infoUser && qrCode && !isTotpEnable && email && (
+          <QrCodeForm email={email} qrcode={qrCode} id={infoUser?.id} />
         )}
 
         {isTotpEnable && email && <NoQrCodeForm email={email} />}
